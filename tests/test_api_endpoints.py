@@ -127,6 +127,19 @@ def test_api_health(client):
     assert data["status"] in ("HEALTHY", "DEGRADED")
     assert len(data["checks"]) >= 4
 
+    # Test refresh query param
+    res_refresh = client.get("/api/health?refresh=true")
+    assert res_refresh.status_code == 200
+    data_refresh = res_refresh.get_json()
+    assert data_refresh["status"] in ("HEALTHY", "DEGRADED")
+
+
+def test_api_health_live_ping(client):
+    for endpoint in ("/api/health/live", "/api/health/ping"):
+        res = client.get(endpoint)
+        assert res.status_code == 200
+        assert res.get_json() == {"status": "UP"}
+
 
 def test_api_health_drift(client):
     res = client.get("/api/health/drift")

@@ -304,12 +304,18 @@ This document provides complete technical specifications for the EduPulse REST A
 
 ## 7. MLOps Health & Drift Endpoints
 
-### 7.1 System Health & Benchmark
+### 7.1 System Health & Diagnostics
 - **URL:** `/api/health`
 - **Method:** `GET`
-- **Response:** Status of model artifact, SHA-256 signatures, pipeline, latency, and database.
+- **Query Params:** `refresh=true` (optional, forces cache invalidation and re-benchmarking)
+- **Response:** Fast, cached (< 2 ms) or fresh (< 30 ms) diagnostic status of model artifact, SHA-256 signatures, pipeline, operational latency, and database connectivity.
 
-### 7.2 Covariate Drift Audit
+### 7.2 Lightweight Liveness Probe
+- **URL:** `/api/health/live` or `/api/health/ping`
+- **Method:** `GET`
+- **Response:** `{"status": "UP"}` instantaneous probe (< 1 ms) for cloud orchestrator liveness checks.
+
+### 7.3 Covariate Drift Audit
 - **URL:** `/api/health/drift`
 - **Method:** `GET`
 - **Response:** Two-sample KS statistics and PSI distributions across all 30 monitored features.
