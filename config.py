@@ -32,6 +32,7 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     SESSION_COOKIE_SECURE = True
+    BOOTSTRAP_ADMIN = True
     # Render's default filesystem is ephemeral. Use a persistent disk or an external DB
     # if CRM writes must survive restarts. Never use the tracked demonstration database.
     DATABASE_PATH = Path(os.environ.get("EDUPULSE_DATABASE_PATH", "/tmp/edupulse/cases.sqlite3"))
