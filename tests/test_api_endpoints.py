@@ -8,6 +8,13 @@ from app import create_app
 @pytest.fixture(scope="module")
 def client():
     app = create_app("testing")
+    store = app.extensions["model_manager"].case_store
+    with store._connect() as db:
+        users = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    if not users:
+        store.create_user("admin", "Admin12345678!", "admin")
+        store.create_user("advisor1", "Advisor12345678!", "advisor",
+                          actor="admin", actor_password="Admin12345678!")
     with app.test_client() as client:
         yield client
 
@@ -172,21 +179,25 @@ def test_api_reports_pdf(client):
 
 def test_api_cases_authentication_and_crud(client):
     # 1. Login with bad credentials
-    bad_res = client.post("/api/cases/login", json={"username": "admin", "password": "WrongPassword!"})
+    csrf = client.get("/api/cases/session").get_json()["csrf_token"]
+    headers = {"X-CSRF-Token": csrf}
+    bad_res = client.post("/api/cases/login", json={"username": "admin", "password": "WrongPassword!"}, headers=headers)
     assert bad_res.status_code == 401
 
     # 2. Login as admin
-    login_res = client.post("/api/cases/login", json={"username": "admin", "password": "Admin12345678!"})
+    login_res = client.post("/api/cases/login", json={"username": "admin", "password": "Admin12345678!"}, headers=headers)
     assert login_res.status_code == 200
     assert login_res.get_json()["status"] == "success"
 
+    # Login rotates the CSRF token.
+    headers = {"X-CSRF-Token": client.get("/api/cases/session").get_json()["csrf_token"]}
     # 3. Create a test case
     create_res = client.post("/api/cases", json={
         "reference": "DEMO-UNITTEST-01",
         "owner": "advisor1",
         "status": "Needs assessment",
         "supports": ["Academic advising", "Tutoring resources"]
-    })
+    }, headers=headers)
     assert create_res.status_code == 200
 
     # 4. List cases
@@ -196,9 +207,9 @@ def test_api_cases_authentication_and_crud(client):
     assert any(c["reference"] == "DEMO-UNITTEST-01" for c in cases)
 
     # 5. Delete test case
-    del_res = client.delete("/api/cases/DEMO-UNITTEST-01")
+    del_res = client.delete("/api/cases/DEMO-UNITTEST-01", headers=headers)
     assert del_res.status_code == 200
 
     # 6. Logout
-    logout_res = client.post("/api/cases/logout")
+    logout_res = client.post("/api/cases/logout", headers=headers)
     assert logout_res.status_code == 200
