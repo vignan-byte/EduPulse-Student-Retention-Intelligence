@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Student Risk Intelligence{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Student Risk Intelligence
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Multi-Class Probabilities, Threshold Screening, and Transparent Decision-Support Guidance
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <span class="badge-ep badge-warning">
+        <i class="bi bi-shield-exclamation"></i> Screening Threshold: {{ "{:.0%}".format(threshold) }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+  <!-- Left Column: Student Profile Input & Presets -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-person-gear text-primary"></i> Student Academic Profile</h3>
+        <p class="ep-card-subtitle">Load demonstration persona or enter custom parameters</p>
+      </div>
+      <div>
+        <select id="archetypeSelect" class="form-select-ep" style="width: auto; font-size: 0.8rem;" onchange="loadArchetype(this.value)">
+          <option value="">-- Load Preset Archetype --</option>
+          {% for name in archetypes.keys() %}
+          <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Quick index lookup -->
+    <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.25rem; background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-md);">
+      <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">Dataset Row Index:</span>
+      <input type="number" id="studentIndexInput" class="form-control-ep" style="width: 110px;" value="130" min="0" max="4423">
+      <button type="button" class="btn-ep btn-ep-secondary" onclick="loadByIndex()">Load Student</button>
+      <span style="font-size: 0.75rem; color: var(--text-muted);">(Index 130 = High Risk Faculty Demo Case)</span>
+    </div>
+
+    <form id="studentRiskForm" onsubmit="evaluateStudentRisk(event)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="form-label-ep">1st Sem Enrolled Units</label>
+          <input type="number" id="sem1_enrolled" class="form-control-ep" value="6.0" step="1.0" min="0" max="30" required>
+        </div>
+        <div>
+          <label class="form-label-ep">1st Sem Approved Units</label>
+          <input type="number" id="sem1_approved" class="form-control-ep" value="1.0" step="1.0" min="0" max="30" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="form-label-ep">1st Sem Grade Average (0–20)</label>
+          <input type="number" id="sem1_grade" class="form-control-ep" value="10.2" step="0.1" min="0" max="20" required>
+        </div>
+        <div>
+          <label class="form-label-ep">Admission Grade (0–200)</label>
+          <input type="number" id="admission_grade" class="form-control-ep" value="115.0" step="0.5" min="0" max="200" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="form-label-ep">Age at Enrollment</label>
+          <input type="number" id="age" class="form-control-ep" value="21" min="15" max="80" required>
+        </div>
+        <div>
+          <label class="form-label-ep">Scholarship Holder</label>
+          <select id="scholarship" class="form-select-ep">
+            <option value="0">No (Standard Status)</option>
+            <option value="1">Yes (Scholarship Recipient)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <label class="form-label-ep">Tuition Fees Up to Date</label>
+          <select id="fees_current" class="form-select-ep">
+            <option value="0">No (Payment Due)</option>
+            <option value="1" selected>Yes (Current)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label-ep">Debtor Status</label>
+          <select id="debtor" class="form-select-ep">
+            <option value="1">Yes (Recorded Arrears)</option>
+            <option value="0" selected>No (No Arrears)</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-ep btn-ep-primary" style="width: 100%;">
+        <i class="bi bi-cpu"></i> Run Multi-Class Risk Evaluation
+      </button>
+    </form>
+  </div>
+
+  <!-- Right Column: Model Risk Assessment Output -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-activity text-cyan"></i> Retention Intelligence Assessment</h3>
+        <p class="ep-card-subtitle">Real-time model prediction and operational tier</p>
+      </div>
+      <span id="riskBadge" class="badge-ep badge-danger">CRITICAL / ADVISOR REVIEW</span>
+    </div>
+
+    <!-- Alert / Status Banner -->
+    <div id="riskBanner" class="alert-ep alert-ep-warning" style="margin-bottom: 1.5rem;">
+      <i class="bi bi-exclamation-octagon-fill" style="font-size: 1.25rem;"></i>
+      <div>
+        <strong id="bannerTitle">Dropout Risk Exceeds Operational Threshold (38.0%)</strong>
+        <div id="bannerText" style="font-size: 0.8rem; margin-top: 2px;">
+          Student flagged for proactive advisor review. Prioritize workload planning and academic tutoring check-in.
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-Class Probabilities -->
+    <h4 style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">
+      Multi-Class Probability Distribution
+    </h4>
+
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #F87171;"><i class="bi bi-x-circle me-1"></i> Dropout Risk</span>
+        <span id="probDropoutText" style="color: #F87171; font-weight: 700;">64.2%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="probDropoutBar" class="prob-fill prob-fill-danger" style="width: 64.2%;"></div>
+      </div>
+    </div>
+
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #60A5FA;"><i class="bi bi-clock-history me-1"></i> Enrolled (In Progress)</span>
+        <span id="probEnrolledText" style="color: #60A5FA; font-weight: 700;">22.1%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="probEnrolledBar" class="prob-fill prob-fill-warning" style="width: 22.1%;"></div>
+      </div>
+    </div>
+
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #34D399;"><i class="bi bi-mortarboard me-1"></i> Graduate</span>
+        <span id="probGradText" style="color: #34D399; font-weight: 700;">13.7%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="probGradBar" class="prob-fill prob-fill-success" style="width: 13.7%;"></div>
+      </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div style="margin-top: 1.5rem;">
+      <h4 style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+        Evidence-Linked Action Referrals
+      </h4>
+      <div id="recommendationsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cohort CSV Upload Screening Tool -->
+<div class="ep-card">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-file-earmark-spreadsheet text-success"></i> Batch Cohort CSV Screening</h3>
+      <p class="ep-card-subtitle">Screen an entire student cohort against the calibrated risk threshold in one click</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; align-items: start;">
+    <div>
+      <form id="cohortUploadForm" onsubmit="handleCohortUpload(event)">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label-ep">Select Cohort CSV File</label>
+          <input type="file" id="cohortFileInput" class="form-control-ep" accept=".csv" required>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label-ep">Screening Threshold</label>
+          <input type="number" id="cohortThreshold" class="form-control-ep" value="{{ threshold }}" step="0.01" min="0.10" max="0.90">
+        </div>
+        <button type="submit" class="btn-ep btn-ep-primary" style="width: 100%;">
+          <i class="bi bi-cloud-arrow-up"></i> Upload & Screen Cohort
+        </button>
+      </form>
+    </div>
+
+    <div>
+      <div id="cohortSummaryArea" style="display: none;">
+        <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1rem;">
+          <div class="kpi-card">
+            <span class="kpi-label">Total Screened</span>
+            <span id="cohortTotalScreened" class="kpi-value">0</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Flagged At-Risk</span>
+            <span id="cohortFlaggedCount" class="kpi-value text-danger">0</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Average Risk</span>
+            <span id="cohortAvgRisk" class="kpi-value">0%</span>
+          </div>
+        </div>
+
+        <h5 style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+          High Priority Cases (Top Flagged Records)
+        </h5>
+        <div style="max-height: 220px; overflow-y: auto;">
+          <table class="table-ep">
+            <thead>
+              <tr>
+                <th>Row</th>
+                <th>Dropout Probability</th>
+                <th>Top Class</th>
+                <th>Confidence</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody id="cohortTableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="cohortPlaceholder" style="background: var(--bg-input); padding: 2rem; border-radius: var(--radius-md); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+        <i class="bi bi-upload" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: var(--text-secondary);"></i>
+        Upload a student records CSV file to evaluate cohort attrition risk and review priority.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
+{% endblock %}

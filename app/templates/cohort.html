@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Cohort Intelligence & Risk Heatmap{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Cohort Intelligence & Risk Heatmap
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Cross-Tabulated Empirical Attrition Patterns Across Academic & Socioeconomic Strata
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <span class="badge-ep badge-primary">
+        <i class="bi bi-people-fill"></i> Total Monitored: {{ "{:,}".format(total_students) }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical Reporting Banner -->
+<div class="alert-ep alert-ep-info">
+  <i class="bi bi-exclamation-circle-fill" style="font-size: 1.25rem;"></i>
+  <div>
+    <strong>Ethical Cohort Reporting Protocol:</strong>
+    Heatmaps display empirical historical dropout percentages across population segments, NOT individual student predictions. To prevent misleading small-sample generalizations, cells with fewer than 30 observations are explicitly tagged with <code>⚠️ N &lt; 30</code>.
+  </div>
+</div>
+
+<!-- Dimension Switcher -->
+<div class="ep-card" style="margin-bottom: 2rem; padding: 1rem 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Stratification Dimension:</span>
+      <select id="dimensionSelect" class="form-select-ep" style="width: 300px;" onchange="loadCohortHeatmap(this.value)">
+        <option value="academics" selected>Academics (Grade Band vs. Unit Completion)</option>
+        <option value="financial">Financial Standing (Tuition Debt vs. Completion)</option>
+        <option value="scholarship">Scholarship Status (Recipient vs. Completion)</option>
+      </select>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+      Cell Color: <span style="color: #34D399; font-weight: 600;">Green (Low Attrition)</span> &rarr; <span style="color: #F87171; font-weight: 600;">Red (High Attrition)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Heatmap Visualization Card -->
+<div class="ep-card" style="margin-bottom: 2rem;">
+  <div class="ep-card-header">
+    <div>
+      <h3 id="heatmapTitle" class="ep-card-title"><i class="bi bi-grid-3x3-gap text-cyan"></i> Empirical Dropout Heatmap</h3>
+      <p id="heatmapSubtitle" class="ep-card-subtitle">Historical cohort attrition rate by completion band and academic strata</p>
+    </div>
+  </div>
+
+  <div id="heatmapLoading" style="display: none; text-align: center; padding: 3rem;">
+    <div class="spinner-ep"></div>
+  </div>
+
+  <div id="cohortHeatmapChart" style="height: 440px;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadCohortHeatmap('academics');
+});
+
+async function loadCohortHeatmap(dimension) {
+  document.getElementById('heatmapLoading').style.display = 'block';
+  document.getElementById('cohortHeatmapChart').style.display = 'none';
+  
+  try {
+    const res = await fetch(`/api/analytics/heatmap?dimension=${dimension}`);
+    const data = await res.json();
+    
+    document.getElementById('heatmapLoading').style.display = 'none';
+    document.getElementById('cohortHeatmapChart').style.display = 'block';
+    
+    if (data.status === 'success') {
+      const trace = {
+        z: data.z_values,
+        x: data.x_categories,
+        y: data.y_categories,
+        text: data.text_matrix,
+        hoverinfo: 'text',
+        type: 'heatmap',
+        colorscale: [
+          [0.0, '#064E3B'],
+          [0.2, '#047857'],
+          [0.4, '#10B981'],
+          [0.6, '#F59E0B'],
+          [0.8, '#DC2626'],
+          [1.0, '#7F1D1D']
+        ],
+        showscale: true,
+        colorbar: {
+          title: 'Dropout Rate',
+          tickformat: '.0%',
+          tickfont: { color: '#9CA3AF' }
+        }
+      };
+      
+      // Add text annotations inside cells
+      const annotations = [];
+      for (let i = 0; i < data.y_categories.length; i++) {
+        for (let j = 0; j < data.x_categories.length; j++) {
+          annotations.push({
+            x: data.x_categories[j],
+            y: data.y_categories[i],
+            text: `<b>${data.text_matrix[i][j]}</b>`,
+            font: { color: '#FFFFFF', size: 12, family: 'Inter, sans-serif' },
+            showarrow: false
+          });
+        }
+      }
+      
+      const layout = {
+        ...darkPlotlyLayout,
+        annotations: annotations,
+        xaxis: {
+          ...darkPlotlyLayout.xaxis,
+          title: `<b>${data.x_label}</b>`
+        },
+        yaxis: {
+          ...darkPlotlyLayout.yaxis,
+          title: `<b>${data.y_label}</b>`
+        },
+        margin: { l: 150, r: 60, t: 30, b: 60 },
+        height: 420
+      };
+      
+      Plotly.newPlot('cohortHeatmapChart', [trace], layout, { responsive: true, displayModeBar: false });
+    }
+  } catch (err) {
+    console.error('Heatmap load failed:', err);
+    document.getElementById('heatmapLoading').style.display = 'none';
+  }
+}
+</script>
+{% endblock %}

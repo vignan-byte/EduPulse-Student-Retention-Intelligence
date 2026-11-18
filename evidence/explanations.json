@@ -1,0 +1,9 @@
+{
+  "shap": {
+    "additivity_error": 6.245004513516506e-17,
+    "prediction": 0.05746220339981251
+  },
+  "lime_terms": 12,
+  "global_sample_rows": 3,
+  "limitation": "LIME surrogate and SHAP may disagree; neither is causal."
+}

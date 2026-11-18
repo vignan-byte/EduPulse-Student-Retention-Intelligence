@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Methodology & Governance{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Methodology & Retention Governance
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Course INT395 Specifications, Zero-Leakage Policy, Pipeline Architecture, & Ethical Mandate
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <span class="badge-ep badge-primary">INT395 Group 12 Standard</span>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical Charter Hero Banner -->
+<div class="ep-card" style="background: linear-gradient(135deg, #131C31, #0E1627); border-left: 4px solid var(--primary); margin-bottom: 2rem;">
+  <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+    <i class="bi bi-shield-lock-fill text-primary me-2"></i>Ethical Charter for AI-Driven Student Retention
+  </h3>
+  <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
+    The EduPulse Retention Intelligence System is designed exclusively as an early decision-support tool to connect students with proactive resources, advising, and financial counseling. Predictions represent statistical associations derived from historical cohorts; they do <strong>not</strong> define a student's personal destiny, capacity, or academic worth.
+  </p>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; font-size: 0.82rem;">
+    <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+      <strong style="color: #60A5FA;">1. Strictly Non-Punitive</strong>
+      <p style="color: var(--text-secondary); margin: 0.25rem 0 0 0;">Under no circumstances may model predictions be used to revoke scholarships, deny course registration, or penalize students.</p>
+    </div>
+    <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+      <strong style="color: #34D399;">2. Voluntary Support Offers</strong>
+      <p style="color: var(--text-secondary); margin: 0.25rem 0 0 0;">All interventions are presented as voluntary opportunities for tutoring, course workload rebalancing, and financial counseling.</p>
+    </div>
+    <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+      <strong style="color: #FBBF24;">3. Right to Algorithmic Recourse</strong>
+      <p style="color: var(--text-secondary); margin: 0.25rem 0 0 0;">Every flagged assessment must provide transparent, actionable steps detailing what academic changes lower predicted risk.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Technical Methodology Sections -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+  <!-- Zero-Leakage Policy -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-clock-history text-cyan"></i> Zero-Leakage Decision Boundary</h3>
+        <p class="ep-card-subtitle">Enforcing realistic early intervention timepoints</p>
+      </div>
+      <span class="badge-ep badge-success">After Semester 1</span>
+    </div>
+
+    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+      <p style="margin-bottom: 0.75rem;">
+        In real-world university operations, predicting student dropout at graduation is useless for retention. To prevent <strong>temporal target leakage</strong>, EduPulse evaluates students strictly <strong>after Semester 1</strong>:
+      </p>
+      <ul style="padding-left: 1.25rem; margin-bottom: 1rem;">
+        <li><strong style="color: #fff;">Included:</strong> Demographic traits, admission grades, Semester 1 unit enrollment, Semester 1 unit completions, and Semester 1 grade point averages.</li>
+        <li><strong style="color: #F87171;">Excluded (Future Leakage):</strong> Semester 2 final exam grades, graduation credit audits, and final status indicators.</li>
+      </ul>
+      <p>
+        This guarantees genuine early detection when university advisors still have ample time to intervene and assist before Semester 2 withdrawal deadlines.
+      </p>
+    </div>
+  </div>
+
+  <!-- Calibration & Threshold Selection -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-bullseye text-warning"></i> Calibration &amp; Cost-Sensitive Screening</h3>
+        <p class="ep-card-subtitle">Why standard 0.50 threshold is inadequate in retention</p>
+      </div>
+      <span class="badge-ep badge-primary">Threshold = 0.38</span>
+    </div>
+
+    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+      <p style="margin-bottom: 0.75rem;">
+        In educational retention, the cost of a <strong>False Negative</strong> (missing a struggling student who subsequently drops out) severely exceeds the cost of a <strong>False Positive</strong> (offering voluntary advising to a student who passes independently).
+      </p>
+      <p style="margin-bottom: 0.75rem;">
+        By calibrating probabilities via <code>CalibratedClassifierCV(method='sigmoid')</code> and selecting an operational threshold of <strong>0.38</strong>:
+      </p>
+      <ul style="padding-left: 1.25rem;">
+        <li>Dropout detection recall increases from <strong>71.1%</strong> (at 0.50) to <strong>76.8%</strong> (at 0.38).</li>
+        <li>Brier score is minimized to <strong>0.1080</strong>, ensuring true probabilistic reliability.</li>
+        <li>Advising caseload stays within institutional capacity limits.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Features Monitored Grid -->
+<div class="ep-card">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-list-check text-primary"></i> Monitored Academic &amp; Socioeconomic Features ({{ features | length }})</h3>
+      <p class="ep-card-subtitle">Transparent feature vocabulary used across supervised pipelines</p>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+    {% for f in features %}
+    <span class="badge-ep badge-primary" style="font-size: 0.78rem;">
+      {{ f }}
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

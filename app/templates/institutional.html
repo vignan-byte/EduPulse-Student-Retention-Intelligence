@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Institutional Analytics & Caseload Capacity Planner{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Institutional Analytics & Capacity Planner
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Staff Bandwidth Optimization, Caseload Feasibility, & Tuition Preservation Modeling
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <span class="badge-ep badge-success">
+        <i class="bi bi-graph-up-arrow"></i> Institutional ROI Modeling
+      </span>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 2rem;">
+  <!-- Left Column: Resource Parameters Form -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-gear text-primary"></i> Advising Parameters</h3>
+        <p class="ep-card-subtitle">Tune staff resources and cohort size</p>
+      </div>
+    </div>
+
+    <form id="capacityForm" onsubmit="calculateCapacity(event)">
+      <div style="margin-bottom: 1rem;">
+        <label class="form-label-ep">Incoming Cohort Size</label>
+        <input type="number" id="cohortSizeInput" class="form-control-ep" value="1200" min="100" max="10000" step="50" required>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label class="form-label-ep">Dedicated Academic Advisors</label>
+        <input type="number" id="advisorCountInput" class="form-control-ep" value="4" min="1" max="50" step="1" required>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label class="form-label-ep">Max Caseload per Advisor</label>
+        <input type="number" id="maxCaseloadInput" class="form-control-ep" value="60" min="10" max="200" step="5" required>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label class="form-label-ep">Estimated Annual Tuition / Student ($)</label>
+        <input type="number" id="tuitionInput" class="form-control-ep" value="5000" min="500" max="50000" step="500" required>
+      </div>
+
+      <button type="submit" class="btn-ep btn-ep-primary" style="width: 100%;">
+        <i class="bi bi-calculator"></i> Recalculate Capacity Feasibility
+      </button>
+    </form>
+  </div>
+
+  <!-- Right Column: Institutional Impact Metrics -->
+  <div class="ep-card">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-bank text-cyan"></i> Operational Feasibility & Tuition Impact</h3>
+        <p class="ep-card-subtitle">Projected retention efficacy at staff capacity equilibrium</p>
+      </div>
+      <span id="planFeasibilityBadge" class="badge-ep badge-success">STAFF BALANCED</span>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 1.5rem;">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Advisor Capacity</span>
+        <span id="kpiTotalCapacity" class="kpi-value text-info">240</span>
+        <span class="kpi-sub">Students maximally manageable</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Recommended Threshold</span>
+        <span id="kpiRecThreshold" class="kpi-value text-cyan">0.38</span>
+        <span class="kpi-sub">Aligns flags with staff bandwidth</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Estimated Retained Students</span>
+        <span id="kpiRetainedStudents" class="kpi-value text-success">58</span>
+        <span class="kpi-sub">Based on 25% proactive intervention lift</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Preserved Tuition Revenue</span>
+        <span id="kpiTuitionSaved" class="kpi-value text-success">$290,000</span>
+        <span class="kpi-sub">Annual institutional tuition preservation</span>
+      </div>
+    </div>
+
+    <!-- Capacity Utilization Bar -->
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #fff;">Caseload Capacity Utilization</span>
+        <span id="utilizationText" style="color: #60A5FA; font-weight: 700;">95.8%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="utilizationBar" class="prob-fill prob-fill-primary" style="width: 95.8%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Operational Threshold Trade-Off Scenarios Table -->
+<div class="ep-card">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-table text-primary"></i> Threshold Operational Trade-Off Scenarios</h3>
+      <p class="ep-card-subtitle">Compare caseload burden, detection recall, and tuition ROI across institutional threshold choices</p>
+    </div>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table class="table-ep">
+      <thead>
+        <tr>
+          <th>Threshold</th>
+          <th>Flagged Students</th>
+          <th>Caseload / Advisor</th>
+          <th>Capacity Utilization</th>
+          <th>Recall (Detection Rate)</th>
+          <th>Estimated Retained</th>
+          <th>Preserved Tuition</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="scenariosTableBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  calculateCapacity();
+});
+
+async function calculateCapacity(e) {
+  if (e) e.preventDefault();
+  const cohort = parseInt(document.getElementById('cohortSizeInput').value, 10);
+  const advisors = parseInt(document.getElementById('advisorCountInput').value, 10);
+  const maxCaseload = parseInt(document.getElementById('maxCaseloadInput').value, 10);
+  const tuition = parseFloat(document.getElementById('tuitionInput').value);
+
+  try {
+    const res = await fetch('/api/analytics/capacity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        total_students: cohort,
+        advisor_count: advisors,
+        max_caseload: maxCaseload,
+        avg_tuition: tuition
+      })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      const plan = data.plan;
+      const rec = plan.recommended_scenario;
+
+      document.getElementById('kpiTotalCapacity').textContent = plan.total_advisor_capacity;
+      document.getElementById('kpiRecThreshold').textContent = rec.threshold.toFixed(2);
+      document.getElementById('kpiRetainedStudents').textContent = rec.estimated_retained_students;
+      document.getElementById('kpiTuitionSaved').textContent = `$${rec.estimated_tuition_preserved.toLocaleString()}`;
+
+      const util = Math.min(100, rec.capacity_utilization_pct);
+      document.getElementById('utilizationText').textContent = `${util.toFixed(1)}%`;
+      document.getElementById('utilizationBar').style.width = `${util}%`;
+
+      const tbody = document.getElementById('scenariosTableBody');
+      tbody.innerHTML = '';
+
+      plan.scenarios.forEach(s => {
+        const tr = document.createElement('tr');
+        const isRec = s.threshold === plan.recommended_threshold;
+        const isOverload = s.capacity_utilization_pct > 100;
+        
+        tr.style.background = isRec ? 'rgba(59, 130, 246, 0.08)' : 'transparent';
+        if (isRec) tr.style.fontWeight = '600';
+
+        tr.innerHTML = `
+          <td><strong style="color: #fff;">${s.threshold.toFixed(2)}</strong> ${isRec ? '<span class="badge-ep badge-success ms-1">RECOMMENDED</span>' : ''}</td>
+          <td>${s.flagged_students}</td>
+          <td>${s.caseload_per_advisor}</td>
+          <td>
+            <span style="color: ${isOverload ? '#F87171' : '#34D399'}; font-weight: 600;">
+              ${s.capacity_utilization_pct.toFixed(1)}%
+            </span>
+          </td>
+          <td>${s.dropout_recall.toFixed(1)}%</td>
+          <td><strong>${s.estimated_retained_students}</strong></td>
+          <td style="color: #34D399;">$${s.estimated_tuition_preserved.toLocaleString()}</td>
+          <td>
+            <span class="badge-ep ${isOverload ? 'badge-danger' : (isRec ? 'badge-primary' : 'badge-success')}">
+              ${isOverload ? 'Staff Overload' : (isRec ? 'Optimal Balanced' : 'Feasible')}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (err) {
+    console.error('Capacity calc failed:', err);
+  }
+}
+</script>
+{% endblock %}

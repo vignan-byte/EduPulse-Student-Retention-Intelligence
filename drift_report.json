@@ -1,0 +1,261 @@
+{
+  "reference_rows": 4424,
+  "candidate_rows": 56,
+  "shared_features": 36,
+  "flagged_features": 1,
+  "features": [
+    {
+      "feature": "Course",
+      "method": "total_variation",
+      "distance": 0.212251356238698,
+      "missing_rate_shift": 0.0,
+      "review": true
+    },
+    {
+      "feature": "Application mode",
+      "method": "total_variation",
+      "distance": 0.1846745027124774,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Mother's occupation",
+      "method": "total_variation",
+      "distance": 0.18331826401446655,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (evaluations)",
+      "method": "ks_statistic",
+      "distance": 0.13991862567811936,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (grade)",
+      "method": "ks_statistic",
+      "distance": 0.12861663652802893,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Father's occupation",
+      "method": "total_variation",
+      "distance": 0.12839059674502717,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Mother's qualification",
+      "method": "total_variation",
+      "distance": 0.12409584086799276,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "GDP",
+      "method": "ks_statistic",
+      "distance": 0.12364376130198915,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Gender",
+      "method": "total_variation",
+      "distance": 0.11957504520795664,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Inflation rate",
+      "method": "ks_statistic",
+      "distance": 0.11912296564195299,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Admission grade",
+      "method": "ks_statistic",
+      "distance": 0.11889692585895117,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (grade)",
+      "method": "ks_statistic",
+      "distance": 0.10940325497287523,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Previous qualification (grade)",
+      "method": "ks_statistic",
+      "distance": 0.09697106690777577,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Father's qualification",
+      "method": "total_variation",
+      "distance": 0.09651898734177214,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (evaluations)",
+      "method": "ks_statistic",
+      "distance": 0.09177215189873418,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (approved)",
+      "method": "ks_statistic",
+      "distance": 0.08905967450271247,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Scholarship holder",
+      "method": "total_variation",
+      "distance": 0.08770343580470162,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Marital Status",
+      "method": "total_variation",
+      "distance": 0.08725135623869801,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Previous qualification",
+      "method": "total_variation",
+      "distance": 0.07775768535262205,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Age at enrollment",
+      "method": "ks_statistic",
+      "distance": 0.07707956600361664,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (approved)",
+      "method": "ks_statistic",
+      "distance": 0.07640144665461121,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (enrolled)",
+      "method": "ks_statistic",
+      "distance": 0.06894213381555153,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Unemployment rate",
+      "method": "ks_statistic",
+      "distance": 0.05628390596745027,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (enrolled)",
+      "method": "ks_statistic",
+      "distance": 0.04792043399638336,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (without evaluations)",
+      "method": "ks_statistic",
+      "distance": 0.04588607594936709,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Nacionality",
+      "method": "total_variation",
+      "distance": 0.04159132007233277,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Displaced",
+      "method": "total_variation",
+      "distance": 0.0409132007233273,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Application order",
+      "method": "total_variation",
+      "distance": 0.04000904159132007,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (credited)",
+      "method": "ks_statistic",
+      "distance": 0.036618444846292945,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 1st sem (without evaluations)",
+      "method": "ks_statistic",
+      "distance": 0.03074141048824593,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "International",
+      "method": "total_variation",
+      "distance": 0.028707052441229692,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Curricular units 2nd sem (credited)",
+      "method": "ks_statistic",
+      "distance": 0.02418625678119349,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Tuition fees up to date",
+      "method": "total_variation",
+      "distance": 0.02350813743218811,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Educational special needs",
+      "method": "total_variation",
+      "distance": 0.011528028933092231,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Debtor",
+      "method": "total_variation",
+      "distance": 0.011301989150090404,
+      "missing_rate_shift": 0.0,
+      "review": false
+    },
+    {
+      "feature": "Daytime/evening attendance",
+      "method": "total_variation",
+      "distance": 0.0020343580470163145,
+      "missing_rate_shift": 0.0,
+      "review": false
+    }
+  ],
+  "warning": "Exploratory covariate shift only; not a validated production drift alarm or fairness audit."
+}

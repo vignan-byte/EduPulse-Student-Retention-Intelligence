@@ -1,0 +1,42 @@
+{
+  "rows": 56,
+  "stage": "After semester 1",
+  "accuracy": 0.8392857142857143,
+  "macro_f1": 0.5811531007751939,
+  "macro_f1_bootstrap_95pct": [
+    0.5161446816134316,
+    0.6303805080590794
+  ],
+  "log_loss": 0.5606941077191941,
+  "confusion_matrix": [
+    [
+      18,
+      0,
+      2
+    ],
+    [
+      3,
+      0,
+      2
+    ],
+    [
+      2,
+      0,
+      29
+    ]
+  ],
+  "dropout_screening": {
+    "threshold": 0.37422709871202403,
+    "tp": 18,
+    "fn": 2,
+    "fp": 4,
+    "tn": 32,
+    "precision": 0.8181818181818182,
+    "recall": 0.9,
+    "brier_score": 0.10032257678450078,
+    "expected_calibration_error_10bin": 0.08076030112411316,
+    "average_precision": 0.8871282344797883,
+    "flagged_count": 22
+  },
+  "warning": "Only genuinely separate institutional/temporal data can establish transferability. Do not reuse training or test data as external validation."
+}

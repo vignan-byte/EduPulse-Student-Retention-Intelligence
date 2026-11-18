@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Student Assessment & Digital Twin Studio{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Student Assessment & Digital Twin Studio
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        What-If Counterfactual Recourse Simulation & Formal Printable Dossier Generation
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn-ep btn-ep-cyan" onclick="downloadDossierPdf()">
+        <i class="bi bi-file-earmark-pdf"></i> Export Dossier PDF
+      </button>
+      <button class="btn-ep btn-ep-secondary" onclick="exportDossierMarkdown()">
+        <i class="bi bi-markdown"></i> Export Markdown
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Governance Alert -->
+<div class="alert-ep alert-ep-info">
+  <i class="bi bi-info-circle-fill" style="font-size: 1.25rem;"></i>
+  <div>
+    <strong>Academic Governance Protocol:</strong>
+    What-if simulations demonstrate non-causal statistical associations learned from historical cohort trajectories. They provide decision-support targets for advisors, not guaranteed outcomes.
+  </div>
+</div>
+
+<!-- Preset Archetype & Index Selector Bar -->
+<div class="ep-card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Active Student Profile:</span>
+      <select id="dtArchetypeSelect" class="form-select-ep" style="width: 320px;" onchange="loadDtArchetype(this.value)">
+        <option value="">-- Choose Profile / Persona --</option>
+        <option value="student_130" selected>Student #130 (High Risk Benchmark Case)</option>
+        {% for name in archetypes.keys() %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+      Baseline Dropout Risk: <strong id="baseRiskHeadline" style="color: #F87171;">64.2%</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison Studio Grid -->
+<div class="comparison-grid">
+  <!-- Baseline Card -->
+  <div class="scenario-column">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-person-fill text-secondary"></i> Baseline Profile (Observed)</h3>
+        <p class="ep-card-subtitle">Recorded historical student semester metrics</p>
+      </div>
+      <span id="baseRiskBadge" class="badge-ep badge-danger">AT RISK (64.2%)</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+        <span style="color: var(--text-secondary);">1st Sem Enrolled Units:</span>
+        <strong id="baseEnrolledText" style="color: #fff;">6.0</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+        <span style="color: var(--text-secondary);">1st Sem Approved Units:</span>
+        <strong id="baseApprovedText" style="color: #F87171;">1.0</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+        <span style="color: var(--text-secondary);">1st Sem Grade Average:</span>
+        <strong id="baseGradeText" style="color: #fff;">10.2 / 20</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+        <span style="color: var(--text-secondary);">Admission Grade:</span>
+        <strong id="baseAdmissionText" style="color: #fff;">115.0</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+        <span style="color: var(--text-secondary);">Tuition Status:</span>
+        <strong id="baseTuitionText" style="color: #F87171;">Arrears / Past Due</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-secondary);">Scholarship Holder:</span>
+        <strong id="baseScholarshipText" style="color: #fff;">No</strong>
+      </div>
+    </div>
+
+    <!-- Baseline Probabilities -->
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #F87171;">Dropout Risk</span>
+        <span id="baseDropoutProb" style="color: #F87171; font-weight: 700;">64.2%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="baseDropoutBar" class="prob-fill prob-fill-danger" style="width: 64.2%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Digital Twin Simulated Scenario Card -->
+  <div class="scenario-column active-sim">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-magic text-cyan"></i> Digital Twin (Simulated)</h3>
+        <p class="ep-card-subtitle">Adjust modifiable factors to observe projected risk shift</p>
+      </div>
+      <span id="simRiskBadge" class="badge-ep badge-success">ON TRACK (29.4%)</span>
+    </div>
+
+    <!-- Sliders and Inputs for Digital Twin -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
+        <label class="form-label-ep" style="margin: 0;">1st Sem Approved Units: <strong id="simApprovedVal" style="color: var(--cyan);">4.0</strong></label>
+        <span style="color: var(--text-muted); font-size: 0.75rem;">Max: 6.0</span>
+      </div>
+      <input type="range" id="simApprovedSlider" min="0" max="6" step="1" value="4" style="width: 100%; accent-color: var(--cyan);" oninput="onSimulationInput()">
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
+        <label class="form-label-ep" style="margin: 0;">1st Sem Grade Average: <strong id="simGradeVal" style="color: var(--cyan);">13.5</strong></label>
+        <span style="color: var(--text-muted); font-size: 0.75rem;">Scale: 0–20</span>
+      </div>
+      <input type="range" id="simGradeSlider" min="0" max="20" step="0.5" value="13.5" style="width: 100%; accent-color: var(--cyan);" oninput="onSimulationInput()">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <label class="form-label-ep">Tuition Balance Status</label>
+        <select id="simTuitionSelect" class="form-select-ep" onchange="onSimulationInput()">
+          <option value="1" selected>Paid / Current (Resolved)</option>
+          <option value="0">Arrears / Past Due</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label-ep">Scholarship Support</label>
+        <select id="simScholarshipSelect" class="form-select-ep" onchange="onSimulationInput()">
+          <option value="0" selected>Standard (No)</option>
+          <option value="1">Scholarship Awarded (Yes)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Simulated Probabilities -->
+    <div class="prob-bar-container">
+      <div class="prob-bar-header">
+        <span style="color: #34D399;">Simulated Dropout Risk</span>
+        <span id="simDropoutProb" style="color: #34D399; font-weight: 700;">29.4%</span>
+      </div>
+      <div class="prob-progress">
+        <div id="simDropoutBar" class="prob-fill prob-fill-success" style="width: 29.4%;"></div>
+      </div>
+    </div>
+
+    <!-- Delta Callout -->
+    <div style="background-color: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: var(--radius-md); padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; margin-top: 1rem;">
+      <span style="font-size: 0.85rem; color: #fff; font-weight: 600;">Net Projected Risk Shift:</span>
+      <span id="simDeltaText" style="font-size: 1.15rem; font-weight: 800; color: #34D399;">-34.8 pp</span>
+    </div>
+  </div>
+</div>
+
+<!-- Algorithmic Recourse Protocol Section -->
+<div class="ep-card" style="margin-top: 1.5rem;">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-signpost-split text-warning"></i> Algorithmic Recourse Milestones</h3>
+      <p class="ep-card-subtitle">Minimal realistic academic & financial steps to bring this student below review threshold</p>
+    </div>
+    <span id="recourseFeasibilityBadge" class="badge-ep badge-success">Realistic Feasibility</span>
+  </div>
+
+  <div id="recourseStepsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <!-- Populated dynamically via JS -->
+  </div>
+</div>
+
+<!-- Scenario History Log Table -->
+<div class="ep-card" style="margin-top: 1.5rem;">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-clock-history text-primary"></i> Simulation History Audit Log</h3>
+      <p class="ep-card-subtitle">Tracked scenarios tested during this advising session</p>
+    </div>
+    <button class="btn-ep btn-ep-secondary" onclick="logCurrentScenario()">
+      <i class="bi bi-bookmark-plus"></i> Save Scenario to Log
+    </button>
+  </div>
+
+  <table class="table-ep">
+    <thead>
+      <tr>
+        <th>Scenario ID</th>
+        <th>1st Sem Approved</th>
+        <th>1st Sem Grade</th>
+        <th>Tuition Status</th>
+        <th>Simulated Risk</th>
+        <th>Risk Delta</th>
+      </tr>
+    </thead>
+    <tbody id="scenarioHistoryBody">
+      <tr>
+        <td>#1 (Initial Baseline)</td>
+        <td>1.0</td>
+        <td>10.2</td>
+        <td>Arrears</td>
+        <td>64.2%</td>
+        <td>0.0 pp</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/simulation.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Intervention Planning & Advisor CRM{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Intervention Planning & Advisor CRM
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Role-Governed SQLite Case Tracking, Support Referrals, & Immutable Audit Trail
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <span class="badge-ep badge-primary">
+        <i class="bi bi-database-check"></i> SQLite / PBKDF2 Hashing
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical Governance Warning -->
+<div class="alert-ep alert-ep-warning">
+  <i class="bi bi-shield-exclamation" style="font-size: 1.25rem;"></i>
+  <div>
+    <strong>Confidentiality & Governance Notice:</strong>
+    All records in this demonstration CRM are strictly fictional (`DEMO-***`). In compliance with student privacy ethics, the CRM enforces structured follow-up categories without free-text personal disclosures.
+  </div>
+</div>
+
+<!-- Login Required Banner (shown when not logged in) -->
+<div id="crmAuthNotice" class="ep-card" style="text-align: center; padding: 3rem 1.5rem; margin-bottom: 2rem;">
+  <i class="bi bi-lock-fill" style="font-size: 2.5rem; color: #60A5FA; display: block; margin-bottom: 1rem;"></i>
+  <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">
+    Advisor Authentication Required
+  </h3>
+  <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.5rem auto; font-size: 0.88rem;">
+    Please sign in using an authorized advisor account to review assigned student intervention plans, log structured check-ins, or manage casework.
+  </p>
+  <button class="btn-ep btn-ep-primary" onclick="openLoginModal()">
+    <i class="bi bi-box-arrow-in-right"></i> Sign In to Advisor Portal
+  </button>
+  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">
+    Faculty Demo Credentials: <code>admin</code> / <code>Admin12345678!</code> or <code>advisor1</code> / <code>Advisor12345678!</code>
+  </div>
+</div>
+
+<!-- Authenticated CRM Workflows -->
+<div id="crmMainContent" style="display: none;">
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Case Creation / Update Form -->
+    <div class="ep-card">
+      <div class="ep-card-header">
+        <div>
+          <h3 class="ep-card-title"><i class="bi bi-file-earmark-plus text-primary"></i> Create / Update Case</h3>
+          <p class="ep-card-subtitle">Log intervention for fictional student record</p>
+        </div>
+      </div>
+
+      <form id="saveCaseForm" onsubmit="handleSaveCase(event)">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label-ep">Student Reference ID</label>
+          <input type="text" id="caseRefInput" class="form-control-ep" placeholder="e.g. DEMO-130" value="DEMO-130" required>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label-ep">Assigned Advisor (Owner)</label>
+          <input type="text" id="caseOwnerInput" class="form-control-ep" value="advisor1" required>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label-ep">Operational Status</label>
+          <select id="caseStatusSelect" class="form-select-ep">
+            {% for st in statuses %}
+            <option value="{{ st }}">{{ st }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label-ep">Referral Support Channels</label>
+          <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; margin-top: 0.4rem;">
+            {% for sup in supports %}
+            <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); cursor: pointer;">
+              <input type="checkbox" name="supportChannels" value="{{ sup }}" style="accent-color: var(--primary);" {% if loop.index <= 2 %}checked{% endif %}>
+              <span>{{ sup }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <button type="submit" class="btn-ep btn-ep-primary" style="width: 100%;">
+          <i class="bi bi-save"></i> Save Intervention Record
+        </button>
+      </form>
+    </div>
+
+    <!-- Active Cases Table -->
+    <div class="ep-card">
+      <div class="ep-card-header">
+        <div>
+          <h3 class="ep-card-title"><i class="bi bi-folder2-open text-cyan"></i> Active Caseload</h3>
+          <p class="ep-card-subtitle">Monitored student retention cases</p>
+        </div>
+        <button class="btn-ep btn-ep-secondary" onclick="loadCrmCases()">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="table-ep">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Support Channels</th>
+              <th>Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="crmCasesTableBody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Audit Trail (Admin role only) -->
+  <div id="adminAuditSection" class="ep-card" style="display: none; margin-top: 2rem;">
+    <div class="ep-card-header">
+      <div>
+        <h3 class="ep-card-title"><i class="bi bi-shield-check text-warning"></i> Immutable Audit History</h3>
+        <p class="ep-card-subtitle">Cryptographically verified access and mutation logs (Administrator View Only)</p>
+      </div>
+      <span class="badge-ep badge-warning">Admin Privilege Verified</span>
+    </div>
+
+    <div style="overflow-x: auto; max-height: 250px;">
+      <table class="table-ep">
+        <thead>
+          <tr>
+            <th>Audit ID</th>
+            <th>Actor</th>
+            <th>Case Reference</th>
+            <th>Action</th>
+            <th>Timestamp (UTC)</th>
+          </tr>
+        </thead>
+        <tbody id="auditTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.onAdvisorLoginSuccess = () => {
+  initCrmView();
+};
+
+window.onAdvisorLogoutSuccess = () => {
+  initCrmView();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCrmView();
+});
+
+async function initCrmView() {
+  try {
+    const res = await fetch('/api/cases/session');
+    const data = await res.json();
+    
+    if (data.logged_in) {
+      document.getElementById('crmAuthNotice').style.display = 'none';
+      document.getElementById('crmMainContent').style.display = 'block';
+      document.getElementById('caseOwnerInput').value = data.username;
+      
+      if (data.role === 'admin') {
+        document.getElementById('adminAuditSection').style.display = 'block';
+        loadAuditTrail();
+      } else {
+        document.getElementById('adminAuditSection').style.display = 'none';
+      }
+      
+      loadCrmCases();
+    } else {
+      document.getElementById('crmAuthNotice').style.display = 'block';
+      document.getElementById('crmMainContent').style.display = 'none';
+    }
+  } catch (err) {
+    console.error('CRM init failed:', err);
+  }
+}
+
+async function loadCrmCases() {
+  try {
+    const res = await fetch('/api/cases');
+    const data = await res.json();
+    const tbody = document.getElementById('crmCasesTableBody');
+    tbody.innerHTML = '';
+    
+    if (data.status === 'success' && data.cases) {
+      if (data.cases.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No active cases registered. Create one using the form on the left.</td></tr>`;
+        return;
+      }
+      
+      data.cases.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color: #60A5FA;">${c.reference}</strong></td>
+          <td>${c.owner}</td>
+          <td><span class="badge-ep ${c.status === 'Closed' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
+          <td style="font-size: 0.78rem; color: var(--text-secondary);">${c.support}</td>
+          <td style="font-size: 0.75rem; color: var(--text-muted);">${c.updated_at}</td>
+          <td>
+            <button class="btn-ep btn-ep-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteCrmCase('${c.reference}')">
+              <i class="bi bi-trash text-danger"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load cases:', err);
+  }
+}
+
+async function handleSaveCase(e) {
+  e.preventDefault();
+  const ref = document.getElementById('caseRefInput').value;
+  const owner = document.getElementById('caseOwnerInput').value;
+  const status = document.getElementById('caseStatusSelect').value;
+  
+  const checkedBoxes = document.querySelectorAll('input[name="supportChannels"]:checked');
+  const supports = Array.from(checkedBoxes).map(cb => cb.value);
+  
+  try {
+    const res = await fetch('/api/cases', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reference: ref,
+        owner: owner,
+        status: status,
+        supports: supports
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.status === 'success') {
+      alert(data.message);
+      loadCrmCases();
+      loadAuditTrail();
+    } else {
+      alert(data.message || 'Error saving case');
+    }
+  } catch (err) {
+    alert('Failed to save case: ' + err);
+  }
+}
+
+async function deleteCrmCase(ref) {
+  if (!confirm(`Delete fictional case ${ref}?`)) return;
+  try {
+    const res = await fetch(`/api/cases/${ref}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok && data.status === 'success') {
+      loadCrmCases();
+      loadAuditTrail();
+    } else {
+      alert(data.message || 'Failed to delete');
+    }
+  } catch (err) {
+    alert('Error: ' + err);
+  }
+}
+
+async function loadAuditTrail() {
+  try {
+    const res = await fetch('/api/cases/audit');
+    const data = await res.json();
+    const tbody = document.getElementById('auditTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    if (data.status === 'success' && data.audit) {
+      data.audit.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${a.id}</td>
+          <td><strong>${a.actor}</strong></td>
+          <td><code>${a.reference}</code></td>
+          <td><span class="badge-ep badge-primary">${a.action}</span></td>
+          <td style="color: var(--text-muted); font-size: 0.75rem;">${a.happened_at}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (err) {
+    console.warn('Audit fetch error:', err);
+  }
+}
+</script>
+{% endblock %}

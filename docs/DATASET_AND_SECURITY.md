@@ -1,0 +1,11 @@
+# Dataset and security
+
+The included UCI 697 table has 4,424 historical records, 36 predictors and three outcome classes: Dropout, Enrolled, Graduate. It is not a fabricated dataset. Enrolled is an unresolved outcome, not proof of permanent retention. Missing-value imputation, numeric scaling and categorical encoding fit only within training folds. Marital Status had a capitalization mismatch in V8's categorical list; the final release corrects it.
+
+Admission removes all semester fields; semester 1 removes semester 2. Known-column allowlisting rejects arbitrary outcome proxies. This does not prove temporal availability of debtor, fee, scholarship or macroeconomic fields: the dataset lacks per-field timestamps. Institutions must establish point-in-time snapshots before any early-warning deployment. Random splitting cannot establish temporal or cross-institutional validity. Protected and socioeconomic attributes require institutional review. No independent institutional data were available.
+
+Passwords use salted PBKDF2-SHA256 with 310,000 rounds and constant-time hash comparison. Users require 12-character passwords. Initial admin bootstrap is a trusted local CLI operation; later user creation requires an admin password. Parameterized SQL and ownership checks protect fictional cases. Follow-up deletion cascades, while minimal reference/action audit entries remain. Local DB backups require their own retention/deletion policy.
+
+The UI has only browser-session login-attempt counting. Missing production controls include central rate limiting, MFA/SSO, session expiry, encryption and key management, secure backup operations, immutable audit, tenant isolation and approved legal/privacy governance. Usernames passed to Python store methods are trusted internal principals, not authentication tokens. Never expose those methods as an API without authentication middleware. Numeric input validation does not validate every UCI categorical domain or prove de-identification.
+
+Analysis pages and batch inference intentionally operate without login on public data. This prevents describing the whole app as a private institutional platform. Real data require an authenticated application perimeter and approved secure storage. Health checks establish server responsiveness only. No security certification or independent penetration audit occurred.

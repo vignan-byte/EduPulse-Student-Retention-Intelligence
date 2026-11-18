@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Explainable AI Studio (SHAP & LIME){% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        Explainable AI Studio (SHAP & LIME)
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Local Feature Attribution, Permutation SHAP Values, & Surrogate Decision Rules
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <span class="badge-ep badge-primary">
+        <i class="bi bi-cpu"></i> Permutation Kernel (N=25 Background)
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical Governance Callout -->
+<div class="alert-ep alert-ep-info">
+  <i class="bi bi-shield-check" style="font-size: 1.25rem;"></i>
+  <div>
+    <strong>Interpretability Protocol:</strong>
+    SHAP and LIME values measure mathematical contributions toward the statistical model's predicted probability. They reflect historical associations, not determinism or intrinsic student capability.
+  </div>
+</div>
+
+<!-- Student Selector Bar -->
+<div class="ep-card" style="margin-bottom: 2rem; padding: 1rem 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Selected Record for Explanation:</span>
+      <select id="xaiSelect" class="form-select-ep" style="width: 320px;" onchange="loadXaiStudent(this.value)">
+        <option value="student_130" selected>Student #130 (High Risk Benchmark Case)</option>
+        {% for name in archetypes.keys() %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button class="btn-ep btn-ep-primary" onclick="runExplanation()">
+        <i class="bi bi-play-circle"></i> Generate Explanations
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SHAP Section -->
+<div class="ep-card" style="margin-bottom: 2rem;">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-bar-chart-line text-primary"></i> SHAP Local Feature Attribution</h3>
+      <p class="ep-card-subtitle">Exact marginal contributions pushing toward or away from Dropout Risk</p>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+      Additivity Check: <strong id="shapAdditivityText" style="color: #34D399;">Passed (Error &lt; 1e-5)</strong>
+    </div>
+  </div>
+
+  <div id="shapLoading" style="display: none; text-align: center; padding: 2rem;">
+    <div class="spinner-ep"></div>
+    <p style="color: var(--text-secondary); margin-top: 0.75rem; font-size: 0.85rem;">
+      Computing permutation SHAP feature attributions on background sample...
+    </p>
+  </div>
+
+  <div id="shapChartContainer" style="height: 380px;"></div>
+
+  <!-- Detailed Table of Top Features -->
+  <div style="margin-top: 1.5rem;">
+    <h4 style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+      Key Feature Drivers & Operational Interpretation
+    </h4>
+    <table class="table-ep">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Student Value</th>
+          <th>SHAP Contribution</th>
+          <th>Direction</th>
+          <th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody id="shapTableBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LIME Section -->
+<div class="ep-card">
+  <div class="ep-card-header">
+    <div>
+      <h3 class="ep-card-title"><i class="bi bi-diagram-2 text-cyan"></i> LIME Local Surrogate Weights</h3>
+      <p class="ep-card-subtitle">Local linear surrogate rules explaining the decision boundary around this student</p>
+    </div>
+    <span class="badge-ep badge-warning">Local Surrogate Rules</span>
+  </div>
+
+  <div id="limeLoading" style="display: none; text-align: center; padding: 2rem;">
+    <div class="spinner-ep"></div>
+    <p style="color: var(--text-secondary); margin-top: 0.75rem; font-size: 0.85rem;">
+      Fitting local tabular surrogate model...
+    </p>
+  </div>
+
+  <div id="limeChartContainer" style="height: 380px;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let activeStudent = {{ student_130 | tojson }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  runExplanation();
+});
+
+async function loadXaiStudent(key) {
+  if (key === 'student_130') {
+    try {
+      const res = await fetch('/api/predict/student/130');
+      const data = await res.json();
+      if (data.status === 'success') {
+        activeStudent = data.student;
+        runExplanation();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (key) {
+    try {
+      const res = await fetch('/api/predict/archetypes');
+      const data = await res.json();
+      if (data.status === 'success' && data.archetypes[key]) {
+        activeStudent = data.archetypes[key];
+        runExplanation();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+
+async function runExplanation() {
+  document.getElementById('shapLoading').style.display = 'block';
+  document.getElementById('shapChartContainer').style.display = 'none';
+  document.getElementById('limeLoading').style.display = 'block';
+  document.getElementById('limeChartContainer').style.display = 'none';
+
+  // Run SHAP
+  try {
+    const resShap = await fetch('/api/explain/shap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student: activeStudent, top_n: 12, max_background: 25 })
+    });
+    const dataShap = await resShap.json();
+    
+    document.getElementById('shapLoading').style.display = 'none';
+    document.getElementById('shapChartContainer').style.display = 'block';
+    
+    if (dataShap.status === 'success') {
+      const pJson = dataShap.plotly_json;
+      // Apply dark theme overrides
+      pJson.layout.paper_bgcolor = 'rgba(0,0,0,0)';
+      pJson.layout.plot_bgcolor = 'rgba(0,0,0,0)';
+      pJson.layout.font = { family: 'Inter, sans-serif', color: '#9CA3AF' };
+      pJson.layout.xaxis.gridcolor = '#1F293D';
+      pJson.layout.yaxis.gridcolor = '#1F293D';
+      
+      Plotly.newPlot('shapChartContainer', pJson.data, pJson.layout, { responsive: true, displayModeBar: false });
+      
+      // Update Table
+      const tbody = document.getElementById('shapTableBody');
+      tbody.innerHTML = '';
+      dataShap.top_features.forEach(f => {
+        const tr = document.createElement('tr');
+        const isRisk = f.shap_effect > 0;
+        tr.innerHTML = `
+          <td><strong style="color: #fff;">${f.feature}</strong></td>
+          <td>${f.student_value}</td>
+          <td><strong style="color: ${isRisk ? '#F87171' : '#34D399'}">${f.shap_effect > 0 ? '+' : ''}${f.shap_effect.toFixed(4)}</strong></td>
+          <td><span class="badge-ep ${isRisk ? 'badge-danger' : 'badge-success'}">${isRisk ? 'Increases Risk' : 'Protective'}</span></td>
+          <td style="color: var(--text-secondary); font-size: 0.8rem;">${f.interpretation}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (err) {
+    console.error('SHAP failed:', err);
+    document.getElementById('shapLoading').style.display = 'none';
+  }
+
+  // Run LIME
+  try {
+    const resLime = await fetch('/api/explain/lime', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student: activeStudent, top_n: 10 })
+    });
+    const dataLime = await resLime.json();
+    
+    document.getElementById('limeLoading').style.display = 'none';
+    document.getElementById('limeChartContainer').style.display = 'block';
+    
+    if (dataLime.status === 'success') {
+      const pJson = dataLime.plotly_json;
+      pJson.layout.paper_bgcolor = 'rgba(0,0,0,0)';
+      pJson.layout.plot_bgcolor = 'rgba(0,0,0,0)';
+      pJson.layout.font = { family: 'Inter, sans-serif', color: '#9CA3AF' };
+      pJson.layout.xaxis.gridcolor = '#1F293D';
+      pJson.layout.yaxis.gridcolor = '#1F293D';
+      
+      Plotly.newPlot('limeChartContainer', pJson.data, pJson.layout, { responsive: true, displayModeBar: false });
+    }
+  } catch (err) {
+    console.error('LIME failed:', err);
+    document.getElementById('limeLoading').style.display = 'none';
+  }
+}
+</script>
+{% endblock %}

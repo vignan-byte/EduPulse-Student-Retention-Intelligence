@@ -1,0 +1,8 @@
+.venv
+artifacts
+local_demo
+upload
+*.zip
+__pycache__
+.git
+.pytest_cache

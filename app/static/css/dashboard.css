@@ -1,0 +1,216 @@
+/* ==========================================================================
+   EduPulse Dashboard & Page-Specific Styles
+   ========================================================================== */
+
+/* Probability Progress Bars */
+.prob-bar-container {
+  margin-bottom: 0.85rem;
+}
+
+.prob-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.prob-progress {
+  height: 8px;
+  background-color: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.prob-fill-danger {
+  background: linear-gradient(90deg, #EF4444, #F87171);
+}
+
+.prob-fill-warning {
+  background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+.prob-fill-success {
+  background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+/* Digital Twin Side-by-Side Comparison Grid */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 992px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scenario-column {
+  background-color: rgba(17, 24, 39, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.scenario-column.active-sim {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+}
+
+/* Confusion Matrix 2x2 Grid */
+.cm-container {
+  display: grid;
+  grid-template-columns: 120px 140px 140px;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.cm-cell {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cm-cell-tp {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.cm-cell-tn {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.cm-cell-fp {
+  background-color: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.cm-cell-fn {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.cm-val {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cm-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.cm-header-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Faculty Demo Progression Stepper */
+.demo-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.demo-step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.demo-step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bg-input);
+  border: 2px solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.demo-step-item.active .demo-step-circle {
+  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  border-color: #60A5FA;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+}
+
+.demo-step-item.completed .demo-step-circle {
+  background-color: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.demo-step-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 80px;
+}
+
+.demo-step-item.active .demo-step-title {
+  color: #fff;
+}
+
+.stepper-progress-line {
+  position: absolute;
+  top: 18px;
+  left: 3rem;
+  right: 3rem;
+  height: 3px;
+  background-color: var(--border-subtle);
+  z-index: 1;
+}
+
+.stepper-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6, #06B6D4);
+  transition: width 0.3s ease;
+}
+
+/* Loading Spinner */
+.spinner-ep {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: ep-spin 0.8s linear infinite;
+}
+
+@keyframes ep-spin {
+  to { transform: rotate(360deg); }
+}

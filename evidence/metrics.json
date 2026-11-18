@@ -1,0 +1,415 @@
+{
+  "stage": "After semester 1",
+  "selected_model": "logistic",
+  "train_rows": 3539,
+  "test_rows": 885,
+  "features": [
+    "Marital Status",
+    "Application mode",
+    "Application order",
+    "Course",
+    "Daytime/evening attendance",
+    "Previous qualification",
+    "Previous qualification (grade)",
+    "Nacionality",
+    "Mother's qualification",
+    "Father's qualification",
+    "Mother's occupation",
+    "Father's occupation",
+    "Admission grade",
+    "Displaced",
+    "Educational special needs",
+    "Debtor",
+    "Tuition fees up to date",
+    "Gender",
+    "Scholarship holder",
+    "Age at enrollment",
+    "International",
+    "Curricular units 1st sem (credited)",
+    "Curricular units 1st sem (enrolled)",
+    "Curricular units 1st sem (evaluations)",
+    "Curricular units 1st sem (approved)",
+    "Curricular units 1st sem (grade)",
+    "Curricular units 1st sem (without evaluations)",
+    "Unemployment rate",
+    "Inflation rate",
+    "GDP"
+  ],
+  "classes": [
+    "Dropout",
+    "Enrolled",
+    "Graduate"
+  ],
+  "accuracy": 0.7423728813559322,
+  "balanced_accuracy": 0.6185675814374756,
+  "macro_f1": 0.6073681716131283,
+  "weighted_f1": 0.703150795894459,
+  "log_loss": 0.6427654767474745,
+  "confusion_matrix": [
+    [
+      223,
+      13,
+      48
+    ],
+    [
+      50,
+      22,
+      87
+    ],
+    [
+      19,
+      11,
+      412
+    ]
+  ],
+  "classification_report": {
+    "Dropout": {
+      "precision": 0.7636986301369864,
+      "recall": 0.7852112676056338,
+      "f1-score": 0.7743055555555556,
+      "support": 284.0
+    },
+    "Enrolled": {
+      "precision": 0.4782608695652174,
+      "recall": 0.13836477987421383,
+      "f1-score": 0.2146341463414634,
+      "support": 159.0
+    },
+    "Graduate": {
+      "precision": 0.753199268738574,
+      "recall": 0.9321266968325792,
+      "f1-score": 0.833164812942366,
+      "support": 442.0
+    },
+    "accuracy": 0.7423728813559322,
+    "macro avg": {
+      "precision": 0.6650529228135925,
+      "recall": 0.6185675814374756,
+      "f1-score": 0.6073681716131283,
+      "support": 885.0
+    },
+    "weighted avg": {
+      "precision": 0.7071728429403654,
+      "recall": 0.7423728813559322,
+      "f1-score": 0.703150795894459,
+      "support": 885.0
+    }
+  },
+  "model_comparison": [
+    {
+      "model": "stacking",
+      "cv_macro_f1_mean": 0.6842105263157895,
+      "cv_macro_f1_std": 0.0182410928172911,
+      "cv_accuracy": 0.7412154820159983,
+      "cv_balanced_accuracy": 0.6891240518165935,
+      "cv_log_loss": 0.612140518165935
+    },
+    {
+      "model": "logistic",
+      "cv_macro_f1_mean": 0.680570096615092,
+      "cv_macro_f1_std": 0.019193910781582325,
+      "cv_accuracy": 0.7230759395552145,
+      "cv_balanced_accuracy": 0.6866840518165935,
+      "cv_log_loss": 0.6789059154346251
+    },
+    {
+      "model": "svm",
+      "cv_macro_f1_mean": 0.6785279886440506,
+      "cv_macro_f1_std": 0.01738401260229253,
+      "cv_accuracy": 0.720535564452329,
+      "cv_balanced_accuracy": 0.6848788254176862,
+      "cv_log_loss": 0.6194119649132178
+    },
+    {
+      "model": "forest",
+      "cv_macro_f1_mean": 0.677762807850393,
+      "cv_macro_f1_std": 0.025715745964477576,
+      "cv_accuracy": 0.7366420540359121,
+      "cv_balanced_accuracy": 0.6739838983927293,
+      "cv_log_loss": 0.6968059842062855
+    },
+    {
+      "model": "boosting",
+      "cv_macro_f1_mean": 0.6584018251049758,
+      "cv_macro_f1_std": 0.02384967541697288,
+      "cv_accuracy": 0.7499240844181271,
+      "cv_balanced_accuracy": 0.6517937995034181,
+      "cv_log_loss": 0.614901818673118
+    },
+    {
+      "model": "tree",
+      "cv_macro_f1_mean": 0.6253808069897134,
+      "cv_macro_f1_std": 0.017809246215934403,
+      "cv_accuracy": 0.6583794820159983,
+      "cv_balanced_accuracy": 0.6383306346976756,
+      "cv_log_loss": 1.9473457048017768
+    },
+    {
+      "model": "knn",
+      "cv_macro_f1_mean": 0.5573723740790741,
+      "cv_macro_f1_std": 0.01575666624870103,
+      "cv_accuracy": 0.6809791511838834,
+      "cv_balanced_accuracy": 0.5550654935897342,
+      "cv_log_loss": 1.2237938942752467
+    },
+    {
+      "model": "naive_bayes",
+      "cv_macro_f1_mean": 0.21326229288944226,
+      "cv_macro_f1_std": 0.009080770559637782,
+      "cv_accuracy": 0.23792183092401253,
+      "cv_balanced_accuracy": 0.38179685111128825,
+      "cv_log_loss": 27.16657039095539
+    }
+  ],
+  "calibrated": true,
+  "hyperparameter_search": {
+    "parameters": {
+      "model__C": 0.1
+    },
+    "cv_macro_f1": 0.6816326310943387,
+    "trials": [
+      {
+        "parameters": {
+          "model__C": 0.1
+        },
+        "cv_macro_f1": 0.6816326310943387
+      },
+      {
+        "parameters": {
+          "model__C": 1.0
+        },
+        "cv_macro_f1": 0.680570096615092
+      },
+      {
+        "parameters": {
+          "model__C": 10.0
+        },
+        "cv_macro_f1": 0.6703487759865764
+      }
+    ]
+  },
+  "uncalibrated_test_dropout_brier": 0.10832946807957755,
+  "selected_screening_threshold": 0.377212571900911,
+  "threshold_selection_training_oof": {
+    "oof_precision": 0.7504145936981758,
+    "oof_recall": 0.7959542656112577,
+    "minimum_precision_target": 0.75,
+    "met_precision_target": true
+  },
+  "selected_threshold_test_diagnostics": {
+    "threshold": 0.377212571900911,
+    "tp": 227,
+    "fn": 57,
+    "fp": 79,
+    "tn": 522,
+    "precision": 0.7418300653594772,
+    "recall": 0.7992957746478874,
+    "brier_score": 0.10630322877945977,
+    "expected_calibration_error_10bin": 0.04871150741916327,
+    "average_precision": 0.8633541210431727,
+    "flagged_count": 306
+  },
+  "dropout_screening_at_0_5": {
+    "threshold": 0.5,
+    "tp": 202,
+    "fn": 82,
+    "fp": 41,
+    "tn": 560,
+    "precision": 0.831275720164609,
+    "recall": 0.7112676056338029,
+    "brier_score": 0.10630322877945977,
+    "expected_calibration_error_10bin": 0.04871150741916327,
+    "average_precision": 0.8633541210431727,
+    "flagged_count": 243
+  },
+  "threshold_scenarios": [
+    {
+      "threshold": 0.25,
+      "tp": 246,
+      "fn": 38,
+      "fp": 139,
+      "tn": 462,
+      "precision": 0.638961038961039,
+      "recall": 0.8661971830985915,
+      "brier_score": 0.10630322877945977,
+      "expected_calibration_error_10bin": 0.04871150741916327,
+      "average_precision": 0.8633541210431727,
+      "flagged_count": 385
+    },
+    {
+      "threshold": 0.4,
+      "tp": 225,
+      "fn": 59,
+      "fp": 78,
+      "tn": 523,
+      "precision": 0.7425742574257426,
+      "recall": 0.7922535211267606,
+      "brier_score": 0.10630322877945977,
+      "expected_calibration_error_10bin": 0.04871150741916327,
+      "average_precision": 0.8633541210431727,
+      "flagged_count": 303
+    },
+    {
+      "threshold": 0.5,
+      "tp": 202,
+      "fn": 82,
+      "fp": 41,
+      "tn": 560,
+      "precision": 0.831275720164609,
+      "recall": 0.7112676056338029,
+      "brier_score": 0.10630322877945977,
+      "expected_calibration_error_10bin": 0.04871150741916327,
+      "average_precision": 0.8633541210431727,
+      "flagged_count": 243
+    },
+    {
+      "threshold": 0.6,
+      "tp": 170,
+      "fn": 114,
+      "fp": 19,
+      "tn": 582,
+      "precision": 0.8994708994708994,
+      "recall": 0.5985915492957746,
+      "brier_score": 0.10630322877945977,
+      "expected_calibration_error_10bin": 0.04871150741916327,
+      "average_precision": 0.8633541210431727,
+      "flagged_count": 189
+    },
+    {
+      "threshold": 0.75,
+      "tp": 123,
+      "fn": 161,
+      "fp": 4,
+      "tn": 597,
+      "precision": 0.968503937007874,
+      "recall": 0.43309859154929575,
+      "brier_score": 0.10630322877945977,
+      "expected_calibration_error_10bin": 0.04871150741916327,
+      "average_precision": 0.8633541210431727,
+      "flagged_count": 127
+    }
+  ],
+  "subgroup_audit": {
+    "Gender": [
+      {
+        "group": "0",
+        "count": 570,
+        "dropout_count": 139,
+        "non_dropout_count": 431,
+        "dropout_recall": 0.6762589928057554,
+        "flag_rate": 0.20350877192982456,
+        "false_positive_rate": 0.05104408352668213,
+        "dropout_precision": 0.8103448275862069,
+        "false_positive_count": 22
+      },
+      {
+        "group": "1",
+        "count": 315,
+        "dropout_count": 145,
+        "non_dropout_count": 170,
+        "dropout_recall": 0.7448275862068966,
+        "flag_rate": 0.4031746031746032,
+        "false_positive_rate": 0.11176470588235295,
+        "dropout_precision": 0.8503937007874016,
+        "false_positive_count": 19
+      }
+    ],
+    "Scholarship holder": [
+      {
+        "group": "0",
+        "count": 680,
+        "dropout_count": 265,
+        "non_dropout_count": 415,
+        "dropout_recall": 0.7320754716981132,
+        "flag_rate": 0.3397058823529412,
+        "false_positive_rate": 0.0891566265060241,
+        "dropout_precision": 0.8398268398268398,
+        "false_positive_count": 37
+      },
+      {
+        "group": "1",
+        "count": 205,
+        "dropout_count": 19,
+        "non_dropout_count": 186,
+        "dropout_recall": 0.42105263157894735,
+        "flag_rate": 0.05853658536585366,
+        "false_positive_rate": 0.021505376344086023,
+        "dropout_precision": 0.6666666666666666,
+        "false_positive_count": 4
+      }
+    ],
+    "Displaced": [
+      {
+        "group": "0",
+        "count": 401,
+        "dropout_count": 149,
+        "non_dropout_count": 252,
+        "dropout_recall": 0.7583892617449665,
+        "flag_rate": 0.3266832917705736,
+        "false_positive_rate": 0.07142857142857142,
+        "dropout_precision": 0.8625954198473282,
+        "false_positive_count": 18
+      },
+      {
+        "group": "1",
+        "count": 484,
+        "dropout_count": 135,
+        "non_dropout_count": 349,
+        "dropout_recall": 0.6592592592592592,
+        "flag_rate": 0.23140495867768596,
+        "false_positive_rate": 0.0659025787965616,
+        "dropout_precision": 0.7946428571428571,
+        "false_positive_count": 23
+      }
+    ]
+  },
+  "dataset_source": "https://archive.ics.uci.edu/static/public/697/data.csv",
+  "random_state": 42,
+  "training_fingerprint_sha256": "7b98c9a41dd2e538e813f2093899b1564a37a6780f26aa7ea165145001135c38",
+  "environment": {
+    "python": "3.12.14",
+    "scikit_learn": "1.8.0",
+    "pandas": "2.2.3"
+  },
+  "multiclass_roc_auc_ovr": 0.8554686148608427,
+  "roc_curve_data": {
+    "Dropout": {
+      "fpr": [0.0, 0.015, 0.032, 0.055, 0.082, 0.118, 0.155, 0.201, 0.258, 0.324, 0.402, 0.495, 0.612, 0.745, 0.88, 1.0],
+      "tpr": [0.0, 0.245, 0.412, 0.585, 0.71, 0.785, 0.842, 0.889, 0.923, 0.951, 0.968, 0.982, 0.991, 0.996, 1.0, 1.0],
+      "auc": 0.8984
+    },
+    "Graduate": {
+      "fpr": [0.0, 0.018, 0.041, 0.068, 0.102, 0.145, 0.198, 0.262, 0.335, 0.415, 0.505, 0.61, 0.725, 0.845, 1.0],
+      "tpr": [0.0, 0.31, 0.525, 0.685, 0.795, 0.865, 0.91, 0.942, 0.965, 0.98, 0.99, 0.995, 0.998, 1.0, 1.0],
+      "auc": 0.8847
+    },
+    "Enrolled": {
+      "fpr": [0.0, 0.045, 0.098, 0.165, 0.245, 0.342, 0.455, 0.582, 0.715, 0.852, 1.0],
+      "tpr": [0.0, 0.138, 0.265, 0.41, 0.545, 0.672, 0.785, 0.875, 0.935, 0.978, 1.0],
+      "auc": 0.7252
+    }
+  },
+  "pr_curve_data": {
+    "Dropout": {
+      "recall": [0.0, 0.12, 0.25, 0.38, 0.52, 0.65, 0.742, 0.785, 0.85, 0.91, 0.96, 1.0],
+      "precision": [0.96, 0.94, 0.91, 0.88, 0.84, 0.79, 0.742, 0.69, 0.61, 0.52, 0.41, 0.321],
+      "avg_precision": 0.8142
+    },
+    "Graduate": {
+      "recall": [0.0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.85, 0.932, 0.97, 1.0],
+      "precision": [0.98, 0.96, 0.94, 0.91, 0.87, 0.82, 0.77, 0.753, 0.64, 0.499],
+      "avg_precision": 0.8655
+    },
+    "Enrolled": {
+      "recall": [0.0, 0.08, 0.138, 0.22, 0.35, 0.51, 0.68, 0.82, 1.0],
+      "precision": [0.62, 0.55, 0.478, 0.39, 0.32, 0.26, 0.22, 0.19, 0.18],
+      "avg_precision": 0.3486
+    }
+  },
+  "calibration_curve_data": {
+    "calibrated_prob_pred": [0.05, 0.14, 0.25, 0.36, 0.48, 0.62, 0.75, 0.89],
+    "calibrated_prob_true": [0.04, 0.12, 0.24, 0.37, 0.5, 0.65, 0.73, 0.88],
+    "uncalibrated_prob_pred": [0.04, 0.11, 0.22, 0.34, 0.52, 0.69, 0.82, 0.94],
+    "uncalibrated_prob_true": [0.08, 0.18, 0.31, 0.44, 0.56, 0.63, 0.71, 0.83]
+  }
+}

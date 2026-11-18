@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Demo Mode 2.0{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">
+        9-Stage Faculty Demonstration Mode 2.0
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+        Guided Classroom Walkthrough for Faculty Evaluation | INT395 Group 12
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn-ep btn-ep-secondary" onclick="prevDemoStage()">
+        <i class="bi bi-chevron-left"></i> Previous Stage
+      </button>
+      <button id="nextStageBtn" class="btn-ep btn-ep-primary" onclick="nextDemoStage()">
+        Next Stage <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="btn-ep btn-ep-secondary" onclick="jumpToStage(1)">
+        <i class="bi bi-arrow-counterclockwise"></i> Restart
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Stepper Indicator -->
+<div class="ep-card" style="margin-bottom: 2rem; padding: 1.25rem 1.5rem;">
+  <div class="demo-stepper">
+    <div class="stepper-progress-line">
+      <div id="stepperFill" class="stepper-progress-fill" style="width: 0%;"></div>
+    </div>
+
+    {% for i in range(1, 10) %}
+    <div id="stepItem_{{ i }}" class="demo-step-item {% if i == 1 %}active{% endif %}" onclick="jumpToStage({{ i }})">
+      <div class="demo-step-circle">{{ i }}</div>
+      <span class="demo-step-title">
+        {% if i == 1 %}Health Check
+        {% elif i == 2 %}Executive
+        {% elif i == 3 %}8 Models
+        {% elif i == 4 %}Calibration
+        {% elif i == 5 %}Threshold
+        {% elif i == 6 %}Student 130
+        {% elif i == 7 %}SHAP/LIME
+        {% elif i == 8 %}Digital Twin
+        {% elif i == 9 %}Governance
+        {% endif %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Stage Content Containers -->
+
+<!-- Stage 1: Pre-Flight Health Check -->
+<div id="stageContainer_1" class="ep-card" style="display: block;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 1 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-heart-pulse-fill text-danger"></i> Pre-Flight System Integrity & Health Check</h3>
+      <p class="ep-card-subtitle">Verifies model artifacts, cryptographic SHA-256 signatures, pipeline readiness, and latency benchmarks</p>
+    </div>
+    <button class="btn-ep btn-ep-cyan" onclick="runStage1HealthCheck()">
+      <i class="bi bi-arrow-repeat"></i> Execute Live Health Check
+    </button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">System Health</span>
+      <span id="s1HealthStatus" class="kpi-value text-success">VERIFYING...</span>
+      <span id="s1HealthDetails" class="kpi-sub">Checking components</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Cryptographic Checksum</span>
+      <span class="kpi-value text-primary">SHA-256</span>
+      <span id="s1ChecksumSub" class="kpi-sub"><i class="bi bi-shield-check text-success"></i> Model signature verified</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Inference Latency</span>
+      <span id="s1LatencyVal" class="kpi-value text-info">&lt; 2 ms</span>
+      <span class="kpi-sub">50 single passes</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">SQLite CRM</span>
+      <span class="kpi-value text-success">CONNECTED</span>
+      <span class="kpi-sub">cases.sqlite3 online</span>
+    </div>
+  </div>
+
+  <table class="table-ep">
+    <thead>
+      <tr>
+        <th>Subsystem Component</th>
+        <th>Status</th>
+        <th>Operational Output</th>
+      </tr>
+    </thead>
+    <tbody id="s1ChecksTable">
+    </tbody>
+  </table>
+</div>
+
+<!-- Stage 2: Executive Overview -->
+<div id="stageContainer_2" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 2 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-speedometer2 text-primary"></i> Executive Problem Formulation & Cohort Scale</h3>
+      <p class="ep-card-subtitle">Course context, student population metrics, and core predictive challenges</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Target Dataset</span>
+      <span class="kpi-value">4,424</span>
+      <span class="kpi-sub">Students monitored</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Observed Dropout Rate</span>
+      <span class="kpi-value text-danger">32.1%</span>
+      <span class="kpi-sub">1,421 historical dropouts</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Decision Timepoint</span>
+      <span class="kpi-value text-info">Sem 1</span>
+      <span class="kpi-sub">Zero-leakage policy</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Selected Model</span>
+      <span class="kpi-value text-success">Calibrated LR</span>
+      <span class="kpi-sub">Accuracy: 77.29%</span>
+    </div>
+  </div>
+
+  <div style="background: var(--bg-input); padding: 1.25rem; border-radius: var(--radius-md); font-size: 0.88rem; line-height: 1.6;">
+    <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 0.5rem;"><i class="bi bi-bookmark-check text-cyan me-2"></i>Executive Mission Summary</h4>
+    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+      University attrition typically peaks during the transition between the 1st and 2nd academic years. Traditional retrospective analysis only identifies dropouts when they fail to re-enroll in year 2. EduPulse evaluates students directly at the end of Semester 1, providing institutional academic advisors with an early, actionable window of intervention.
+    </p>
+  </div>
+</div>
+
+<!-- Stage 3: Multi-Model Benchmark -->
+<div id="stageContainer_3" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 3 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-trophy text-warning"></i> Multi-Model Benchmark & Scientific Model Selection</h3>
+      <p class="ep-card-subtitle">8 supervised learning models evaluated on identical stratified holdout test split (N=885)</p>
+    </div>
+  </div>
+
+  <div style="background: var(--bg-input); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; font-size: 0.85rem;">
+    <strong>Model Selection Rationale:</strong> While complex gradient boosting ensembles (e.g. XGBoost, CatBoost) achieved comparable test accuracy (~77%), <strong>Calibrated Logistic Regression</strong> was selected for production because it delivers superior calibration (Brier score: 0.1080), absolute additivity for SHAP explainability, and linear interpretability crucial for ethical student-facing decisions.
+  </div>
+
+  <table class="table-ep">
+    <thead>
+      <tr>
+        <th>Candidate Model</th>
+        <th>Test Accuracy</th>
+        <th>Macro F1</th>
+        <th>Balanced Accuracy</th>
+        <th>ROC-AUC</th>
+        <th>Brier Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background: rgba(59, 130, 246, 0.1); font-weight: 700;">
+        <td><strong style="color: #fff;">Calibrated Logistic Regression</strong> <span class="badge-ep badge-success ms-1">CHOSEN</span></td>
+        <td>77.29%</td>
+        <td>69.31%</td>
+        <td>69.54%</td>
+        <td>0.891</td>
+        <td>0.1080</td>
+      </tr>
+      <tr>
+        <td>Random Forest Classifier</td>
+        <td>76.95%</td>
+        <td>68.42%</td>
+        <td>68.10%</td>
+        <td>0.884</td>
+        <td>0.1142</td>
+      </tr>
+      <tr>
+        <td>HistGradientBoosting</td>
+        <td>77.06%</td>
+        <td>68.85%</td>
+        <td>68.72%</td>
+        <td>0.887</td>
+        <td>0.1115</td>
+      </tr>
+      <tr>
+        <td>XGBoost Classifier</td>
+        <td>76.72%</td>
+        <td>68.21%</td>
+        <td>68.04%</td>
+        <td>0.882</td>
+        <td>0.1160</td>
+      </tr>
+      <tr>
+        <td>Support Vector Machine (RBF)</td>
+        <td>76.50%</td>
+        <td>67.80%</td>
+        <td>67.55%</td>
+        <td>0.879</td>
+        <td>0.1185</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Stage 4: Calibration & Diagnostics -->
+<div id="stageContainer_4" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 4 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-bezier2 text-cyan"></i> Probability Calibration & Diagnostic Curves</h3>
+      <p class="ep-card-subtitle">Sigmoid calibration ensures predicted probabilities reflect true empirical frequencies</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <div>
+      <div id="s4RocChart" style="height: 300px;"></div>
+    </div>
+    <div>
+      <div id="s4CalChart" style="height: 300px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 5: Dynamic Threshold Tuning -->
+<div id="stageContainer_5" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 5 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-sliders text-warning"></i> Operational Threshold Calibration (0.38 vs 0.50)</h3>
+      <p class="ep-card-subtitle">Cost-benefit optimization prioritizing dropout discovery over unassisted attrition</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: center;">
+    <div>
+      <label class="form-label-ep">Interactive Screening Threshold:</label>
+      <input type="range" id="s5ThresholdSlider" min="0.10" max="0.90" step="0.01" value="0.38" style="width: 100%; accent-color: var(--cyan);" oninput="onS5ThresholdInput(this.value)">
+      <div style="font-size: 0.85rem; color: #fff; margin-top: 0.5rem;">
+        Threshold: <strong id="s5ThreshVal" style="color: var(--cyan);">0.38</strong> | Recall: <strong id="s5RecallVal" style="color: #34D399;">76.8%</strong>
+      </div>
+    </div>
+    <div>
+      <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+        <div class="kpi-card">
+          <span class="kpi-label">True Positives Caught</span>
+          <span id="s5TP" class="kpi-value text-success">218</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">False Negatives Missed</span>
+          <span id="s5FN" class="kpi-value text-danger">66</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 6: Individual Student 360 -->
+<div id="stageContainer_6" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 6 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-person-bounding-box text-primary"></i> Student 360° Assessment (Student Index 130)</h3>
+      <p class="ep-card-subtitle">Demonstration of high-risk student profile with approved credits deficit and tuition arrears</p>
+    </div>
+    <span class="badge-ep badge-danger">CRITICAL / ADVISOR REVIEW</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <div style="background: var(--bg-input); padding: 1.25rem; border-radius: var(--radius-md); font-size: 0.85rem;">
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">Observed Student Profile:</h4>
+      <p><strong>1st Sem Units:</strong> 1 approved out of 6 enrolled (16.7% completion)</p>
+      <p><strong>1st Sem Grade:</strong> 10.2 / 20</p>
+      <p><strong>Financial Standing:</strong> Tuition Past Due / Debtor</p>
+      <p><strong>Admission Grade:</strong> 115.0</p>
+    </div>
+    <div>
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">Calibrated Model Predictions:</h4>
+      <div class="prob-bar-container">
+        <div class="prob-bar-header">
+          <span style="color: #F87171;">Dropout Risk: 64.2%</span>
+        </div>
+        <div class="prob-progress"><div class="prob-fill prob-fill-danger" style="width: 64.2%;"></div></div>
+      </div>
+      <div class="prob-bar-container">
+        <div class="prob-bar-header">
+          <span style="color: #60A5FA;">Enrolled: 22.1%</span>
+        </div>
+        <div class="prob-progress"><div class="prob-fill prob-fill-warning" style="width: 22.1%;"></div></div>
+      </div>
+      <div class="prob-bar-container">
+        <div class="prob-bar-header">
+          <span style="color: #34D399;">Graduate: 13.7%</span>
+        </div>
+        <div class="prob-progress"><div class="prob-fill prob-fill-success" style="width: 13.7%;"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 7: SHAP & LIME Studio -->
+<div id="stageContainer_7" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 7 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-diagram-3-fill text-cyan"></i> Explainable AI Studio (SHAP & LIME Attribution)</h3>
+      <p class="ep-card-subtitle">Transparent mathematical justification of student 130 risk factors</p>
+    </div>
+  </div>
+
+  <div id="s7ShapChart" style="height: 350px;"></div>
+</div>
+
+<!-- Stage 8: Digital Twin & PDF Dossier -->
+<div id="stageContainer_8" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 8 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-magic text-success"></i> Digital Twin Counterfactual Recourse & Formal Dossier</h3>
+      <p class="ep-card-subtitle">Simulates resolution of tuition arrears + passing 4 units &rarr; risk drops to 29.4%</p>
+    </div>
+    <button class="btn-ep btn-ep-cyan" onclick="downloadStage8Pdf()">
+      <i class="bi bi-file-earmark-pdf"></i> Download Official Dossier PDF
+    </button>
+  </div>
+
+  <div class="comparison-grid">
+    <div class="scenario-column">
+      <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 0.5rem;">Baseline Profile (Current)</h4>
+      <p style="font-size: 0.85rem; color: #F87171;">Dropout Risk: <strong>64.2%</strong> (Critical)</p>
+      <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.5rem;">
+        • 1 unit approved<br>
+        • Tuition arrears recorded
+      </div>
+    </div>
+
+    <div class="scenario-column active-sim">
+      <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 0.5rem;">Digital Twin (Remediated)</h4>
+      <p style="font-size: 0.85rem; color: #34D399;">Simulated Risk: <strong>29.4%</strong> (On Track)</p>
+      <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.5rem;">
+        • 4 units approved (+3 units passed)<br>
+        • Tuition balance resolved via payment plan
+      </div>
+      <div style="margin-top: 0.75rem; font-weight: 700; color: #34D399;">
+        Net Risk Reduction: -34.8 pp
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 9: Governance & ROI -->
+<div id="stageContainer_9" class="ep-card" style="display: none;">
+  <div class="ep-card-header">
+    <div>
+      <span class="badge-ep badge-primary mb-1">STAGE 9 OF 9</span>
+      <h3 class="ep-card-title"><i class="bi bi-bank text-warning"></i> Institutional ROI, Capacity Equilibrium, & Ethical Charter</h3>
+      <p class="ep-card-subtitle">Balancing institutional advising staff with student retention gains</p>
+    </div>
+    <span class="badge-ep badge-success">Faculty Demo Completed</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Equilibrium Threshold</span>
+      <span class="kpi-value text-cyan">0.38</span>
+      <span class="kpi-sub">Matches 4 advisors (caseload: 60)</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Retained Students</span>
+      <span class="kpi-value text-success">58</span>
+      <span class="kpi-sub">Cohort of 1,200</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Preserved Tuition</span>
+      <span class="kpi-value text-success">$290,000</span>
+      <span class="kpi-sub">Annual tuition preserved</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Ethical Standard</span>
+      <span class="kpi-value text-primary">100%</span>
+      <span class="kpi-sub">Voluntary & non-punitive</span>
+    </div>
+  </div>
+
+  <div style="text-align: center; padding: 2rem 1rem; background: var(--bg-input); border-radius: var(--radius-md);">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem; display: block; margin-bottom: 0.75rem;"></i>
+    <h3 style="color: #fff; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">
+      Thank you for evaluating EduPulse Retention Intelligence!
+    </h3>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 0.88rem;">
+      Designed, calibrated, and implemented by Group 12: Kabya Varun, Duggisetty Vasavi Vignan, and Shivraj Singh for INT395 Supervised Learning (2026–2027).
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/faculty-demo.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{
+  "release_name": "EduPulse v11.0 (Flask Enterprise Edition)",
+  "course": "INT395 - Supervised Learning",
+  "group": 12,
+  "authors": [
+    "Kabya Varun",
+    "Duggisetty Vasavi Vignan",
+    "Shivraj Singh"
+  ],
+  "zip_file": "EduPulse_v11_Flask_Professional_Release.zip",
+  "zip_size_bytes": 332814,
+  "zip_sha256": "8a3e4aaaa5471850d84a385f2323639bc96ad6a624981d72b85f3b1fab5afd0b",
+  "files_count": 90
+}

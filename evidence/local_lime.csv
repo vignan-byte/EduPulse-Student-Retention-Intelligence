@@ -1,0 +1,13 @@
+condition,lime_weight
+Tuition fees up to date=1,-0.27250648342638145
+5.00 < Curricular units 1st sem (approved) <= 6.00,-0.2027060872150762
+Curricular units 1st sem (credited) <= 0.00,-0.14334198106302387
+Debtor=0,-0.08276654386761882
+Gender=1,0.056224653906027586
+Curricular units 1st sem (without evaluations) <= 0.00,0.047755130668496515
+Curricular units 1st sem (grade) > 13.40,-0.039311476437312746
+Scholarship holder=0,0.03647330963112512
+Application mode=44,-0.03502442850082073
+Father's qualification=3,0.030835156159906247
+Displaced=1,0.03018124361316745
+11.10 < Unemployment rate <= 13.90,0.026095885448093548
