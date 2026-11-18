@@ -20,6 +20,8 @@ def create_app(config_name: str | None = None) -> Flask:
     
     # 1. Load Configuration
     cfg = config_by_name.get(config_name, config_by_name["default"])
+    if config_name == "production":
+        cfg.validate()
     app.config.from_object(cfg)
     
     # 2. Initialize Singletons & ML Engine
