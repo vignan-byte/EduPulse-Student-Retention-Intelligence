@@ -42,9 +42,6 @@
   <button class="btn-ep btn-ep-primary" onclick="openLoginModal()">
     <i class="bi bi-box-arrow-in-right"></i> Sign In to Advisor Portal
   </button>
-  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">
-    Faculty Demo Credentials: <code>admin</code> / <code>Admin12345678!</code> or <code>advisor1</code> / <code>Advisor12345678!</code>
-  </div>
 </div>
 
 <!-- Authenticated CRM Workflows -->
@@ -160,6 +157,12 @@
 
 {% block scripts %}
 <script>
+function escapeCrmHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+}
+
 window.onAdvisorLoginSuccess = () => {
   initCrmView();
 };
@@ -215,13 +218,13 @@ async function loadCrmCases() {
       data.cases.forEach(c => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong style="color: #60A5FA;">${c.reference}</strong></td>
-          <td>${c.owner}</td>
-          <td><span class="badge-ep ${c.status === 'Closed' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
-          <td style="font-size: 0.78rem; color: var(--text-secondary);">${c.support}</td>
-          <td style="font-size: 0.75rem; color: var(--text-muted);">${c.updated_at}</td>
+          <td><strong style="color: #60A5FA;">${escapeCrmHtml(c.reference)}</strong></td>
+          <td>${escapeCrmHtml(c.owner)}</td>
+          <td><span class="badge-ep ${c.status === 'Closed' ? 'badge-success' : 'badge-warning'}">${escapeCrmHtml(c.status)}</span></td>
+          <td style="font-size: 0.78rem; color: var(--text-secondary);">${escapeCrmHtml(c.support)}</td>
+          <td style="font-size: 0.75rem; color: var(--text-muted);">${escapeCrmHtml(c.updated_at)}</td>
           <td>
-            <button class="btn-ep btn-ep-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteCrmCase('${c.reference}')">
+            <button class="btn-ep btn-ep-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteCrmCase('${escapeCrmHtml(c.reference)}')">
               <i class="bi bi-trash text-danger"></i>
             </button>
           </td>
@@ -244,7 +247,7 @@ async function handleSaveCase(e) {
   const supports = Array.from(checkedBoxes).map(cb => cb.value);
   
   try {
-    const res = await fetch('/api/cases', {
+    const res = await crmMutation('/api/cases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -270,7 +273,7 @@ async function handleSaveCase(e) {
 async function deleteCrmCase(ref) {
   if (!confirm(`Delete fictional case ${ref}?`)) return;
   try {
-    const res = await fetch(`/api/cases/${ref}`, { method: 'DELETE' });
+    const res = await crmMutation(`/api/cases/${encodeURIComponent(ref)}`, { method: 'DELETE' });
     const data = await res.json();
     if (res.ok && data.status === 'success') {
       loadCrmCases();
@@ -295,11 +298,11 @@ async function loadAuditTrail() {
       data.audit.forEach(a => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>#${a.id}</td>
-          <td><strong>${a.actor}</strong></td>
-          <td><code>${a.reference}</code></td>
-          <td><span class="badge-ep badge-primary">${a.action}</span></td>
-          <td style="color: var(--text-muted); font-size: 0.75rem;">${a.happened_at}</td>
+          <td>#${escapeCrmHtml(a.id)}</td>
+          <td><strong>${escapeCrmHtml(a.actor)}</strong></td>
+          <td><code>${escapeCrmHtml(a.reference)}</code></td>
+          <td><span class="badge-ep badge-primary">${escapeCrmHtml(a.action)}</span></td>
+          <td style="color: var(--text-muted); font-size: 0.75rem;">${escapeCrmHtml(a.happened_at)}</td>
         `;
         tbody.appendChild(tr);
       });

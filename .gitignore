@@ -3,3 +3,8 @@ __pycache__/
 .pytest_cache/
 *.pyc
 local_demo/test_cases.sqlite3
+
+local_demo/*.sqlite3
+.env
+.env.*
+!.env.example

@@ -3,6 +3,25 @@
  * Handles global session management, modal dialogs, and common utility functions.
  */
 
+let eduPulseCsrfToken = null;
+
+async function getCrmCsrfToken() {
+  const res = await fetch('/api/cases/session', { credentials: 'same-origin' });
+  if (!res.ok) throw new Error('Could not initialize session protection');
+  const data = await res.json();
+  eduPulseCsrfToken = data.csrf_token;
+  return eduPulseCsrfToken;
+}
+
+async function crmMutation(url, options = {}) {
+  const token = await getCrmCsrfToken();
+  return fetch(url, {
+    ...options,
+    credentials: 'same-origin',
+    headers: { ...(options.headers || {}), 'X-CSRF-Token': token }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   checkSessionStatus();
 });
@@ -11,6 +30,7 @@ async function checkSessionStatus() {
   try {
     const res = await fetch('/api/cases/session');
     const data = await res.json();
+    eduPulseCsrfToken = data.csrf_token;
     const authUsername = document.getElementById('authUsername');
     const authPill = document.getElementById('authPill');
     
@@ -56,7 +76,7 @@ async function handleAdvisorLogin(e) {
   const statusArea = document.getElementById('loginStatusArea');
   
   try {
-    const res = await fetch('/api/cases/login', {
+    const res = await crmMutation('/api/cases/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -88,7 +108,7 @@ async function handleAdvisorLogin(e) {
 
 async function handleAdvisorLogout() {
   try {
-    await fetch('/api/cases/logout', { method: 'POST' });
+    await crmMutation('/api/cases/logout', { method: 'POST' });
     closeLoginModal();
     checkSessionStatus();
     if (window.onAdvisorLogoutSuccess) window.onAdvisorLogoutSuccess();

@@ -1,6 +1,11 @@
 """API Endpoints for Case Management, Follow-ups, and Advisor CRM."""
 from __future__ import annotations
 from flask import Blueprint, request, jsonify, session
+import hmac
+import secrets
+import threading
+import time
+from collections import defaultdict, deque
 from app.services.case_service import (
     authenticate_user, get_user_role, get_cases, save_case, delete_case,
     list_advisors, record_followup, list_followups, get_audit_trail,
@@ -9,6 +14,45 @@ from app.services.case_service import (
 from src.case_store import AuthorizationError
 
 cases_bp = Blueprint("api_cases", __name__, url_prefix="/api/cases")
+
+# Best-effort single-process throttling. Replace with shared Redis-backed limits
+# before scaling beyond one process/instance.
+_attempts = defaultdict(deque)
+_attempt_lock = threading.Lock()
+_WINDOW_SECONDS = 900
+_MAX_ATTEMPTS = 8
+
+
+def _csrf_token():
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+    return session["csrf_token"]
+
+
+@cases_bp.before_request
+def protect_case_mutations():
+    if request.method not in ("POST", "PUT", "PATCH", "DELETE"):
+        return None
+    expected = _csrf_token()
+    supplied = request.headers.get("X-CSRF-Token", "")
+    if not supplied or not hmac.compare_digest(supplied, expected):
+        return jsonify({"status": "error", "message": "Invalid CSRF token"}), 403
+    return None
+
+
+def _login_throttled():
+    # Remote IP is a coarse throttle; do not trust user-supplied forwarded headers.
+    key = request.remote_addr or "unknown"
+    now = time.monotonic()
+    with _attempt_lock:
+        entries = _attempts[key]
+        while entries and entries[0] < now - _WINDOW_SECONDS:
+            entries.popleft()
+        if len(entries) >= _MAX_ATTEMPTS:
+            return True
+        entries.append(now)
+        return False
+
 
 
 def _get_current_user():
@@ -21,6 +65,8 @@ def _get_current_user():
 
 @cases_bp.route("/login", methods=["POST"])
 def login():
+    if _login_throttled():
+        return jsonify({"status": "error", "message": "Too many attempts; try later"}), 429
     try:
         data = request.get_json(force=True) or {}
         username = (data.get("username") or "").strip().lower()
@@ -31,6 +77,8 @@ def login():
             return jsonify({"status": "error", "message": "Invalid username or password"}), 401
             
         role = get_user_role(authenticated_user)
+        session.clear()
+        session["csrf_token"] = secrets.token_urlsafe(32)
         session["username"] = authenticated_user
         session["role"] = role
         
@@ -46,8 +94,7 @@ def login():
 
 @cases_bp.route("/logout", methods=["POST"])
 def logout():
-    session.pop("username", None)
-    session.pop("role", None)
+    session.clear()
     return jsonify({"status": "success", "message": "Logged out successfully"})
 
 
@@ -55,9 +102,10 @@ def logout():
 def session_status():
     user, role = _get_current_user()
     if not user:
-        return jsonify({"logged_in": False})
+        return jsonify({"logged_in": False, "csrf_token": _csrf_token()})
     return jsonify({
         "logged_in": True,
+        "csrf_token": _csrf_token(),
         "username": user,
         "role": role,
         "statuses": get_case_statuses(),
