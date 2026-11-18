@@ -1,0 +1,7 @@
+{
+  "release_version": "9.0.0",
+  "files": {
+    "model.joblib": "4dd82be2dc14c5b158bb6d121e2f4e2d8f481f0619ccd5b5d8fe03caf3eb2f00",
+    "metrics.json": "e3379ec51ebeed8dec5f56e5a066ee4f5852dd0e92a524117c27202910103f43"
+  }
+}

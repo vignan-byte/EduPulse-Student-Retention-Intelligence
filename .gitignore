@@ -1,7 +1,5 @@
 .venv/
 __pycache__/
 .pytest_cache/
-artifacts/
-data/*.csv
 *.pyc
-local_demo/
+local_demo/test_cases.sqlite3
