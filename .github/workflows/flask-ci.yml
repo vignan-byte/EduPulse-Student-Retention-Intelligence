@@ -20,6 +20,6 @@ jobs:
       - name: Verify artifact loading and Flask routes
         env:
           FLASK_ENV: testing
-        run: python -m pytest -q tests/test_flask_app.py tests/test_api_endpoints.py tests/test_deployment_security.py
+        run: python -m pytest -q tests/test_flask_app.py tests/test_api_endpoints.py tests/test_deployment_security.py tests/test_artifact_compatibility.py
       - name: Verify dependency resolution
         run: python -m pip check
