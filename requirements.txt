@@ -12,3 +12,4 @@ lime>=0.2.0.1,<1
 pytest>=7,<10
 scipy>=1.10,<2
 reportlab>=4.0,<5
+gunicorn>=22,<24
