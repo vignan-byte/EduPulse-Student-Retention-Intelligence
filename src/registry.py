@@ -9,8 +9,13 @@ import joblib
 
 
 def sha256_file(path: str | Path) -> str:
+    p = Path(path)
+    # Normalize CRLF to LF for text/JSON files to ensure deterministic cross-platform hashing
+    if p.suffix in (".json", ".txt", ".csv", ".md"):
+        content = p.read_bytes().replace(b"\r\n", b"\n")
+        return hashlib.sha256(content).hexdigest()
     digest = hashlib.sha256()
-    with open(path, "rb") as handle:
+    with open(p, "rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
