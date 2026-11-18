@@ -16,4 +16,4 @@ services:
       - key: EDUPULSE_SECRET_KEY
         generateValue: true
       - key: EDUPULSE_ADMIN_PASSWORD
-        sync: false
+        generateValue: true
