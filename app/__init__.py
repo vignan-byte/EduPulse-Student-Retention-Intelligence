@@ -32,6 +32,17 @@ def create_app(config_name: str | None = None) -> Flask:
     register_routes(app)
     register_api_blueprints(app)
     
+    @app.after_request
+    def security_headers(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["X-Frame-Options"] = "DENY"
+        if request.path.startswith("/api/cases"):
+            response.headers["Cache-Control"] = "no-store"
+        if config_name == "production":
+            response.headers["Strict-Transport-Security"] = "max-age=31536000"
+        return response
+
     # 4. Context Processors for Templates
     @app.context_processor
     def inject_metadata():
