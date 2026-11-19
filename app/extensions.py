@@ -33,11 +33,11 @@ class ModelManager:
         # Never create accounts with hard-coded passwords on public hosts.
         with self.case_store._connect() as db:
             user_count = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-        if user_count == 0:
+        if user_count == 0 and app.config.get("BOOTSTRAP_ADMIN", False):
             import os
             password = os.environ.get("EDUPULSE_ADMIN_PASSWORD")
             if not password or len(password) < 12:
-                if app.config.get("BOOTSTRAP_ADMIN", False) and os.environ.get("FLASK_ENV") == "production" and not (os.environ.get("RENDER") or os.environ.get("PORT")):
+                if os.environ.get("FLASK_ENV") == "production" and not (os.environ.get("RENDER") or os.environ.get("PORT")):
                     raise RuntimeError("Set a strong EDUPULSE_ADMIN_PASSWORD for bootstrap")
                 password = "EduPulse2026!Admin"
             self.case_store.create_user("admin", password, "admin")
