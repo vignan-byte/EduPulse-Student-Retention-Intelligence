@@ -21,7 +21,23 @@ def create_app(config_name: str | None = None) -> Flask:
     # 1. Load Configuration
     cfg = config_by_name.get(config_name, config_by_name["default"])
     if config_name == "production":
-        cfg.validate()
+        try:
+            cfg.validate()
+        except RuntimeError:
+            if os.environ.get("RENDER") or os.environ.get("PORT"):
+                import secrets
+                if not os.environ.get("EDUPULSE_SECRET_KEY"):
+                    gen_key = secrets.token_hex(32)
+                    os.environ["EDUPULSE_SECRET_KEY"] = gen_key
+                    cfg.SECRET_KEY = gen_key
+                    app.logger.warning("[EduPulse Security] Auto-generated secure EDUPULSE_SECRET_KEY for deployment.")
+                if not os.environ.get("EDUPULSE_ADMIN_PASSWORD"):
+                    gen_pwd = "EduPulse2026!" + secrets.token_hex(8)
+                    os.environ["EDUPULSE_ADMIN_PASSWORD"] = gen_pwd
+                    app.logger.warning("[EduPulse Security] Auto-generated secure EDUPULSE_ADMIN_PASSWORD for deployment.")
+                cfg.validate()
+            else:
+                raise
     app.config.from_object(cfg)
     
     # 2. Initialize Singletons & ML Engine

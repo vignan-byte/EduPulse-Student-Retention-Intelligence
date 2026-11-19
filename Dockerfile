@@ -1,15 +1,34 @@
-FROM python:3.11-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=5000 \
+    FLASK_ENV=production
+
 WORKDIR /app
+
+# Install system utilities
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-COPY src ./src
-COPY app.py ./app.py
-COPY data ./data
-RUN python -m src.train --stage "After semester 1" && \
-    useradd --create-home --uid 10001 appuser && \
-    mkdir -p /app/local_demo && chown -R appuser:appuser /app/local_demo
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application source code and artifacts
+COPY . .
+
+# Ensure unprivileged app user with proper write permissions for SQLite DB
+RUN useradd --create-home --uid 10001 appuser && \
+    mkdir -p /app/local_demo /tmp/edupulse && \
+    chown -R appuser:appuser /app /tmp/edupulse
+
 USER appuser
-EXPOSE 8501
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health',timeout=3)" || exit 1
-CMD ["python", "-m", "streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD curl -f http://127.0.0.1:${PORT:-5000}/api/health/live || exit 1
+
+CMD ["sh", "-c", "exec gunicorn --config gunicorn.conf.py wsgi:application"]

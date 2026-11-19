@@ -5,6 +5,7 @@ import sys
 from app import create_app
 
 app = create_app()
+application = app  # Alias for compatibility with gunicorn app:application
 
 def main():
     default_port = int(os.environ.get("PORT", 5000))
