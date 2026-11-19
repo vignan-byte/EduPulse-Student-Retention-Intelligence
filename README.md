@@ -5,6 +5,9 @@
 - Duggisetty Vasavi Vignan
 - Shivraj Singh
 
+**Live Cloud Deployment (Render):**
+👉 **[https://edupulse-flask-th4m.onrender.com](https://edupulse-flask-th4m.onrender.com)**
+
 ---
 
 ## 🌟 Executive Summary

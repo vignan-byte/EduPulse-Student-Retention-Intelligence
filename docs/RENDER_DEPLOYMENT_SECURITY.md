@@ -1,5 +1,9 @@
 # EduPulse Flask v11 — Render deployment review
 
+**Live Production URL:** [https://edupulse-flask-th4m.onrender.com](https://edupulse-flask-th4m.onrender.com)
+**Live Healthcheck:** [https://edupulse-flask-th4m.onrender.com/api/health](https://edupulse-flask-th4m.onrender.com/api/health)
+**Live Liveness Probe:** [https://edupulse-flask-th4m.onrender.com/api/health/live](https://edupulse-flask-th4m.onrender.com/api/health/live)
+
 ## Implemented on this PR branch
 - Strong production secret validation and HTTPS-only session cookies.
 - New production SQLite database path, separate from the former committed demo DB.
